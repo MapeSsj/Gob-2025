@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Instituto Técnico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --accent: #f97316;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --student: #3b82f6;
+            --collaborator: #f97316;
+            --admin: #8b5cf6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Back button */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+        
+        /* Floating icons background */
+        .floating-icons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .floating-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+        }
+        
+        .floating-icon:nth-child(1) { top: 10%; left: 5%; animation-duration: 20s; }
+        .floating-icon:nth-child(2) { top: 20%; left: 80%; animation-duration: 25s; }
+        .floating-icon:nth-child(3) { top: 70%; left: 10%; animation-duration: 18s; }
+        .floating-icon:nth-child(4) { top: 40%; left: 90%; animation-duration: 22s; }
+        .floating-icon:nth-child(5) { top: 85%; left: 70%; animation-duration: 30s; }
+        .floating-icon:nth-child(6) { top: 30%; left: 20%; animation-duration: 24s; }
+        .floating-icon:nth-child(7) { top: 60%; left: 85%; animation-duration: 28s; }
+        
+        /* Login container */
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            z-index: 10;
+            padding: 1rem;
+        }
+        
+        .login-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .login-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .login-header {
+            text-align: center;
+            padding: 2.5rem 2rem 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .login-header p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 0 1.5rem;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 1.2rem 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 600;
+            color: var(--gray);
+        }
+        
+        .tab.active {
+            color: var(--light);
+        }
+        
+        .tab.student.active {
+            color: var(--student);
+        }
+        
+        .tab.collaborator.active {
+            color: var(--collaborator);
+        }
+        
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .tab.student::after {
+            background: var(--student);
+        }
+        
+        .tab.collaborator::after {
+            background: var(--collaborator);
+        }
+        
+        .tab.active::after {
+            transform: scaleX(1);
+        }
+        
+        /* Forms */
+        .form-container {
+            padding: 2rem 2.5rem;
+        }
+        
+        .form {
+            display: none;
+        }
+        
+        .form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 1rem;
+            top: 1.1rem;
+            color: var(--gray);
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+        
+        .input-group.student input:focus {
+            border-color: var(--student);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        
+        .input-group.collaborator input:focus {
+            border-color: var(--collaborator);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+        }
+        
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .remember input {
+            accent-color: var(--primary);
+        }
+        
+        .forgot {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .forgot:hover {
+            color: var(--student);
+            text-decoration: underline;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        
+        .btn-login {
+            background: var(--primary);
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-login:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn.student {
+            background: var(--student);
+        }
+        
+        .btn.student:hover {
+            background: #2563eb;
+        }
+        
+        .btn.collaborator {
+            background: var(--collaborator);
+        }
+        
+        .btn.collaborator:hover {
+            background: #ea580c;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .divider span {
+            padding: 0 1rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .social-btn.google:hover {
+            background: #db4437;
+        }
+        
+        .social-btn.microsoft:hover {
+            background: #0078d7;
+        }
+        
+        .social-btn.github:hover {
+            background: #333;
+        }
+        
+        .login-footer {
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .login-footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(10px, 15px);
+            }
+            50% {
+                transform: translate(20px, 5px);
+            }
+            75% {
+                transform: translate(10px, 15px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1rem;
+            }
+            
+            .login-header {
+                padding: 1.5rem 1.5rem 0;
+            }
+            
+            .form-container {
+                padding: 1.5rem;
+            }
+            
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+            
+            .tabs {
+                margin: 0 1rem;
+            }
+            
+            .tab {
+                padding: 1rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back button -->
+    <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    
+    <!-- Floating icons background -->
+    <div class="floating-icons">
+        <div class="floating-icon"><i class="fas fa-microchip"></i></div>
+        <div class="floating-icon"><i class="fas fa-bolt"></i></div>
+        <div class="floating-icon"><i class="fas fa-plug"></i></div>
+        <div class="floating-icon"><i class="fas fa-server"></i></div>
+        <div class="floating-icon"><i class="fas fa-robot"></i></div>
+        <div class="floating-icon"><i class="fas fa-cog"></i></div>
+        <div class="floating-icon"><i class="fas fa-circuit-board"></i></div>
+    </div>
+    
+    <!-- Login Container -->
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-bolt"></i>
+                    <h1>Instituto República Federal de Alemania</h1>
+                </div>
+                <p>Sistema de Aula Virtual - Especialidad en Sistemas Eléctricos y Electrónicos</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab student active" data-tab="student-form">
+                    <i class="fas fa-user-graduate"></i> Estudiante
+                </div>
+                <div class="tab collaborator" data-tab="collaborator-form">
+                    <i class="fas fa-chalkboard-teacher"></i> Colaborador
+                </div>
+            </div>
+            
+            <!-- Forms Container -->
+            <div class="form-container">
+                <!-- Student Form -->
+                <form class="form active" id="student-form">
+                    <div class="input-group student">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="student-email" placeholder="Correo electrónico" required>
+                    </div>
+                    
+                    <div class="input-group student">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="student-password" placeholder="Contraseña" required>
+                    </div>
+                    
+                    <div class="options">
+                        <label class="remember">
+                            <input type="checkbox"> Recordarme
+                        </label>
+                        <a href="#" class="forgot">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-login student">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </button>
+                    
+                    <div class="divider">
+                        <span>o continuar con</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <a href="#" class="social-btn google">
+                            <i class="fab fa-google"></i>
+                        </a>
+                        <a href="#" class="social-btn microsoft">
+                            <i class="fab fa-microsoft"></i>
+                        </a>
+                        <a href="#" class="social-btn github">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </form>
+                
+                <!-- Collaborator Form -->
+                <form class="form" id="collaborator-form">
+                    <div class="input-group collaborator">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="collaborator-email" placeholder="Correo institucional" required>
+                    </div>
+                    
+                    <div class="input-group collaborator">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="collaborator-password" placeholder="Contraseña" required>
+                    </div>
+                    
+                    <div class="options">
+                        <label class="remember">
+                            <input type="checkbox"> Recordarme
+                        </label>
+                        <a href="#" class="forgot">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-login collaborator">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </button>
+                    
+                    <div class="divider">
+                        <span>o continuar con</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <a href="#" class="social-btn google">
+                            <i class="fab fa-google"></i>
+                        </a>
+                        <a href="#" class="social-btn microsoft">
+                            <i class="fab fa-microsoft"></i>
+                        </a>
+                        <a href="#" class="social-btn github">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="login-footer">
+                © 2023 Instituto Técnico. Todos los derechos reservados.
+                <br>
+                <a href="#">Política de privacidad</a> | <a href="#">Términos de uso</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Get the target form
+                const targetForm = tab.getAttribute('data-tab');
+                
+                // Hide all forms
+                document.querySelectorAll('.form').forEach(form => {
+                    form.classList.remove('active');
+                });
+                
+                // Show target form
+                document.getElementById(targetForm).classList.add('active');
+            });
+        });
+        
+        // Form submission handling
+        document.getElementById('student-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('student-email').value;
+            const password = document.getElementById('student-password').value;
+            
+            if (email === 'estudiante@gmail.com' && password === '123456') {
+                loginSuccess('student', '/3/estudiante/dashboard.html');
+            } else {
+                loginError('student', 'Credenciales incorrectas');
+            }
+        });
+        
+        document.getElementById('collaborator-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('collaborator-email').value;
+            const password = document.getElementById('collaborator-password').value;
+            
+            if (email === 'colaborador@gmail.com' && password === '123456') {
+                loginSuccess('collaborator', '/3/colaborador/dashboarddocente.html');
+            } else {
+                loginError('collaborator', 'Credenciales incorrectas');
+            }
+        });
+        
+        function loginSuccess(role, redirectUrl) {
+            const button = document.querySelector(`.btn.${role}`);
+            const originalText = button.innerHTML;
+            
+            // Show loading state
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
+            button.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Show success message
+                button.innerHTML = '<i class="fas fa-check"></i> ¡Bienvenido!';
+                button.style.backgroundColor = '#10b981';
+                
+                // Redirect after a moment
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1500);
+            }, 2000);
+        }
+        
+        function loginError(role, message) {
+            const button = document.querySelector(`.btn.${role}`);
+            const originalText = button.innerHTML;
+            
+            // Show loading state
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            button.disabled = true;
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Show error message
+                button.innerHTML = '<i class="fas fa-times"></i> Error';
+                button.style.backgroundColor = '#ef4444';
+                
+                // Show alert
+                alert(message);
+                
+                // Reset button after a moment
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    button.style.backgroundColor = '';
+                }, 1500);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

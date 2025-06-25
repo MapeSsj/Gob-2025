@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Docente - Instituto Técnico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --accent: #f97316;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --student: #3b82f6;
+            --collaborator: #f97316;
+            --admin: #8b5cf6;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --card-radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f4f8;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Floating icons background */
+        .floating-icons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.05;
+            animation: float 15s infinite linear;
+            color: var(--collaborator);
+        }
+        
+        .floating-icon:nth-child(1) { top: 10%; left: 5%; animation-duration: 20s; }
+        .floating-icon:nth-child(2) { top: 20%; left: 80%; animation-duration: 25s; }
+        .floating-icon:nth-child(3) { top: 70%; left: 10%; animation-duration: 18s; }
+        .floating-icon:nth-child(4) { top: 40%; left: 90%; animation-duration: 22s; }
+        .floating-icon:nth-child(5) { top: 85%; left: 70%; animation-duration: 30s; }
+        .floating-icon:nth-child(6) { top: 30%; left: 20%; animation-duration: 24s; }
+        .floating-icon:nth-child(7) { top: 60%; left: 85%; animation-duration: 28s; }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(160deg, var(--secondary), #1a2435);
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar-header i {
+            font-size: 1.8rem;
+            color: var(--collaborator);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            color: var(--light);
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
+            padding: 1.5rem 0;
+        }
+        
+        .menu-title {
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 0.5rem 1.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: rgba(249, 115, 22, 0.15);
+            border-left-color: var(--collaborator);
+        }
+        
+        .menu-item.active {
+            background: rgba(249, 115, 22, 0.2);
+            border-left-color: var(--collaborator);
+        }
+        
+        .menu-item i {
+            width: 24px;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+            color: var(--gray);
+        }
+        
+        .menu-item:hover i, .menu-item.active i {
+            color: var(--collaborator);
+        }
+        
+        .menu-item span {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        /* Main content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .header-left h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .header-left h1 i {
+            color: var(--collaborator);
+        }
+        
+        .header-left p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border-radius: 50px;
+            border: 1px solid #cbd5e1;
+            width: 250px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--collaborator);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: #e2e8f0;
+        }
+        
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--collaborator), #ea580c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-info .name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .user-info .role {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        /* Dashboard content */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--collaborator), #ea580c);
+            border-radius: var(--card-radius);
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-banner::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .welcome-banner::after {
+            content: "";
+            position: absolute;
+            bottom: -80px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .welcome-banner h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .welcome-banner p {
+            max-width: 600px;
+            font-size: 1.05rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--collaborator);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-card.courses {
+            border-left-color: var(--success);
+        }
+        
+        .stat-card.students {
+            border-left-color: var(--primary);
+        }
+        
+        .stat-card.pending {
+            border-left-color: var(--danger);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-icon.collaborator {
+            background: var(--collaborator);
+        }
+        
+        .stat-icon.courses {
+            background: var(--success);
+        }
+        
+        .stat-icon.students {
+            background: var(--primary);
+        }
+        
+        .stat-icon.pending {
+            background: var(--danger);
+        }
+        
+        .stat-info h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .stat-info p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        /* Courses section */
+        .section-title {
+            font-size: 1.5rem;
+            margin: 2rem 0 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--secondary);
+        }
+        
+        .section-title i {
+            color: var(--collaborator);
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .course-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background: var(--collaborator);
+        }
+        
+        .course-info {
+            flex: 1;
+        }
+        
+        .course-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .course-info p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .course-body {
+            padding: 1.5rem;
+        }
+        
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .meta-item i {
+            font-size: 1rem;
+        }
+        
+        .course-footer {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--collaborator);
+            color: var(--collaborator);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(249, 115, 22, 0.1);
+        }
+        
+        .btn-primary {
+            background: var(--collaborator);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(249, 115, 22, 0.3);
+        }
+        
+        /* Recent activities */
+        .activities-container {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .activity-item {
+            display: flex;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--collaborator);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-desc {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.5rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .search-box input {
+                width: 200px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .search-box input {
+                width: 150px;
+            }
+            
+            .user-info {
+                display: none;
+            }
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(10px, 15px);
+            }
+            50% {
+                transform: translate(20px, 5px);
+            }
+            75% {
+                transform: translate(10px, 15px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating icons background -->
+    <div class="floating-icons">
+        <div class="floating-icon"><i class="fas fa-microchip"></i></div>
+        <div class="floating-icon"><i class="fas fa-bolt"></i></div>
+        <div class="floating-icon"><i class="fas fa-plug"></i></div>
+        <div class="floating-icon"><i class="fas fa-server"></i></div>
+        <div class="floating-icon"><i class="fas fa-robot"></i></div>
+        <div class="floating-icon"><i class="fas fa-cog"></i></div>
+        <div class="floating-icon"><i class="fas fa-circuit-board"></i></div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-bolt"></i>
+            <h2>Instituto Técnico</h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-title">MENÚ PRINCIPAL</div>
+            <a href="/3/colaborador/dashboarddocente.html" class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/3/colaborador/cursosdocente.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span>Mis cursos</span>
+            </a>
+            <a href="/3/colaborador/calificacionesdocente.html" class="menu-item">
+                <i class="fas fa-tasks"></i>
+                <span>Tareas y Evaluaciones</span>
+            </a>
+
+
+            
+            <div class="menu-title">ESPECIALIDADES</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-plug"></i>
+                <span>Sistemas Eléctricos</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-microchip"></i>
+                <span>Electrónica Industrial</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Controladores Lógicos</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-cogs"></i>
+                <span>Automatización</span>
+            </a>
+            
+            <div class="menu-title">CONFIGURACIÓN</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Ajustes</span>
+            </a>
+            <a href="/3/proyecto3.html" class="menu-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-chalkboard-teacher"></i> Panel del Docente</h1>
+                <p>Especialidad en Sistemas Eléctricos y Electrónicos</p>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar estudiantes, cursos...">
+                </div>
+                
+                <div class="user-profile">
+                    <div class="avatar">RM</div>
+                    <div class="user-info">
+                        <div class="name">Ricardo Mendoza</div>
+                        <div class="role">Docente - Ciclo IV</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h2>¡Bienvenido, Prof. Mendoza!</h2>
+            <p>Gestiona tus cursos, revisa trabajos pendientes y mantén un seguimiento del progreso de tus estudiantes.</p>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon collaborator">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>5</h3>
+                        <p>Cursos Asignados</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card courses">
+                <div class="stat-header">
+                    <div class="stat-icon courses">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>87</h3>
+                        <p>Estudiantes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card students">
+                <div class="stat-header">
+                    <div class="stat-icon students">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>23</h3>
+                        <p>Tareas Pendientes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card pending">
+                <div class="stat-header">
+                    <div class="stat-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>5</h3>
+                        <p>Por Calificar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- My Courses -->
+        <h2 class="section-title"><i class="fas fa-book-open"></i> Mis Cursos</h2>
+        
+        <div class="courses-grid">
+            <!-- Course 1 -->
+            <div class="course-card">
+                <div class="course-header">
+                    <div class="course-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="course-info">
+                        <h3>Instalaciones Eléctricas</h3>
+                        <p>Grupo A - Ciclo IV</p>
+                    </div>
+                </div>
+                
+                <div class="course-body">
+                    <p><strong>Horario:</strong> Lunes y Miércoles 8:00 - 12:00</p>
+                    <p><strong>Aula:</strong> Laboratorio 3</p>
+                    
+                    <div class="course-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span>18 Estudiantes</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-book"></i>
+                            <span>Unidad 4</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-footer">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-list"></i> Ver Estudiantes
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Gestionar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Course 2 -->
+            <div class="course-card">
+                <div class="course-header">
+                    <div class="course-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="course-info">
+                        <h3>Electrónica Digital</h3>
+                        <p>Grupo B - Ciclo III</p>
+                    </div>
+                </div>
+                
+                <div class="course-body">
+                    <p><strong>Horario:</strong> Martes y Jueves 14:00 - 18:00</p>
+                    <p><strong>Aula:</strong> Laboratorio 2</p>
+                    
+                    <div class="course-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span>15 Estudiantes</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-book"></i>
+                            <span>Unidad 3</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-footer">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-list"></i> Ver Estudiantes
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Gestionar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Course 3 -->
+            <div class="course-card">
+                <div class="course-header">
+                    <div class="course-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="course-info">
+                        <h3>Programación de PLCs</h3>
+                        <p>Grupo C - Ciclo V</p>
+                    </div>
+                </div>
+                
+                <div class="course-body">
+                    <p><strong>Horario:</strong> Viernes 8:00 - 14:00</p>
+                    <p><strong>Aula:</strong> Taller Automatización</p>
+                    
+                    <div class="course-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span>12 Estudiantes</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-book"></i>
+                            <span>Unidad 5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-footer">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-list"></i> Ver Estudiantes
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Gestionar
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activities -->
+        <h2 class="section-title"><i class="fas fa-bell"></i> Actividades Recientes</h2>
+        
+        <div class="activities-container">
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Nuevas entregas recibidas</div>
+                    <div class="activity-desc">5 estudiantes han entregado el proyecto de Circuitos Trifásicos</div>
+                    <div class="activity-time">Hace 2 horas</div>
+                </div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-comment"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Nuevos mensajes</div>
+                    <div class="activity-desc">Tienes 3 mensajes sin leer de estudiantes</div>
+                    <div class="activity-time">Hace 5 horas</div>
+                </div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Próxima reunión</div>
+                    <div class="activity-desc">Revisión de plan de estudios - Viernes 10:00</div>
+                    <div class="activity-time">Mañana</div>
+                </div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">Tareas pendientes</div>
+                    <div class="activity-desc">7 trabajos de Electrónica Digital por calificar</div>
+                    <div class="activity-time">Ayer</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upcoming Deadlines -->
+        <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Próximas Fechas Límite</h2>
+        
+        <div class="courses-grid">
+            <div class="course-card">
+                <div class="course-header">
+                    <div class="course-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="course-info">
+                        <h3>Instalaciones Eléctricas</h3>
+                        <p>Fecha límite: 28 Junio 2023</p>
+                    </div>
+                </div>
+                
+                <div class="course-body">
+                    <p><strong>Tarea:</strong> Diseño de instalación trifásica</p>
+                    <p><strong>Estudiantes:</strong> 18/18 han entregado</p>
+                    
+                    <div class="course-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Faltan 3 días</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-percentage"></i>
+                            <span>20% de la nota</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-footer">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-eye"></i> Ver Entregas
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-check"></i> Calificar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="course-card">
+                <div class="course-header">
+                    <div class="course-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="course-info">
+                        <h3>Electrónica Digital</h3>
+                        <p>Fecha límite: 30 Junio 2023</p>
+                    </div>
+                </div>
+                
+                <div class="course-body">
+                    <p><strong>Examen:</strong> Sistemas combinacionales</p>
+                    <p><strong>Estudiantes:</strong> 15/15 han entregado</p>
+                    
+                    <div class="course-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Faltan 5 días</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-percentage"></i>
+                            <span>30% de la nota</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-footer">
+                    <button class="btn btn-outline">
+                        <i class="fas fa-eye"></i> Ver Exámenes
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-check"></i> Calificar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulación de funcionalidad del menú
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Simular acciones de botones
+        document.querySelectorAll('.btn-primary').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> ¡Listo!';
+                    this.style.backgroundColor = '#10b981';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                        this.style.backgroundColor = '';
+                    }, 2000);
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>

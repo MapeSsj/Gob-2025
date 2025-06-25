@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calificaciones - Instituto Técnico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #0f172a;
+            --accent: #f97316;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --student: #3b82f6;
+            --collaborator: #f97316;
+            --admin: #8b5cf6;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --card-radius: 12px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f4f8;
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Floating icons background */
+        .floating-icons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            opacity: 0.05;
+            animation: float 15s infinite linear;
+            color: var(--collaborator);
+        }
+        
+        .floating-icon:nth-child(1) { top: 10%; left: 5%; animation-duration: 20s; }
+        .floating-icon:nth-child(2) { top: 20%; left: 80%; animation-duration: 25s; }
+        .floating-icon:nth-child(3) { top: 70%; left: 10%; animation-duration: 18s; }
+        .floating-icon:nth-child(4) { top: 40%; left: 90%; animation-duration: 22s; }
+        .floating-icon:nth-child(5) { top: 85%; left: 70%; animation-duration: 30s; }
+        .floating-icon:nth-child(6) { top: 30%; left: 20%; animation-duration: 24s; }
+        .floating-icon:nth-child(7) { top: 60%; left: 85%; animation-duration: 28s; }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(160deg, var(--secondary), #1a2435);
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar-header i {
+            font-size: 1.8rem;
+            color: var(--collaborator);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            color: var(--light);
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
+            padding: 1.5rem 0;
+        }
+        
+        .menu-title {
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 0.5rem 1.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.5rem;
+            color: var(--light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover {
+            background: rgba(249, 115, 22, 0.15);
+            border-left-color: var(--collaborator);
+        }
+        
+        .menu-item.active {
+            background: rgba(249, 115, 22, 0.2);
+            border-left-color: var(--collaborator);
+        }
+        
+        .menu-item i {
+            width: 24px;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+            color: var(--gray);
+        }
+        
+        .menu-item:hover i, .menu-item.active i {
+            color: var(--collaborator);
+        }
+        
+        .menu-item span {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        /* Main content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .header-left h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .header-left h1 i {
+            color: var(--collaborator);
+        }
+        
+        .header-left p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border-radius: 50px;
+            border: 1px solid #cbd5e1;
+            width: 250px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--collaborator);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile:hover {
+            background: #e2e8f0;
+        }
+        
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--collaborator), #ea580c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-info .name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .user-info .role {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        /* Dashboard content */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--collaborator), #ea580c);
+            border-radius: var(--card-radius);
+            padding: 2rem;
+            color: white;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-banner::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .welcome-banner::after {
+            content: "";
+            position: absolute;
+            bottom: -80px;
+            right: 20px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .welcome-banner h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .welcome-banner p {
+            max-width: 600px;
+            font-size: 1.05rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Course selector */
+        .course-selector {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .selector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .selector-header h2 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .selector-header h2 i {
+            color: var(--collaborator);
+        }
+        
+        .select-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .select-group label {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .select-group select {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            font-size: 1rem;
+            min-width: 250px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .select-group select:focus {
+            outline: none;
+            border-color: var(--collaborator);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+        }
+        
+        /* Students list */
+        .students-container {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .students-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .students-header h2 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .students-header h2 i {
+            color: var(--collaborator);
+        }
+        
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .students-table th {
+            text-align: left;
+            padding: 1rem;
+            background: #f8fafc;
+            color: var(--secondary);
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .students-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .student-name {
+            font-weight: 600;
+        }
+        
+        .student-code {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .grade-input {
+            width: 80px;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .grade-input:focus {
+            outline: none;
+            border-color: var(--collaborator);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+        }
+        
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .file-name {
+            font-size: 0.9rem;
+            color: var(--gray);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+        
+        .file-upload-btn {
+            background: #f1f5f9;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload-btn:hover {
+            background: #e2e8f0;
+            color: var(--collaborator);
+        }
+        
+        .file-upload-btn i {
+            font-size: 1rem;
+        }
+        
+        /* Assignment details */
+        .assignment-container {
+            background: white;
+            border-radius: var(--card-radius);
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .assignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .assignment-header h2 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .assignment-header h2 i {
+            color: var(--collaborator);
+        }
+        
+        .assignment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 4px solid var(--collaborator);
+        }
+        
+        .detail-card h3 {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .detail-card p {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--collaborator);
+            color: var(--collaborator);
+        }
+        
+        .btn-outline:hover {
+            background: rgba(249, 115, 22, 0.1);
+        }
+        
+        .btn-primary {
+            background: var(--collaborator);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #ea580c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(249, 115, 22, 0.3);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .search-box input {
+                width: 200px;
+            }
+            
+            .selector-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .select-group {
+                width: 100%;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .select-group select {
+                width: 100%;
+            }
+            
+            .students-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .search-box input {
+                width: 150px;
+            }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .assignment-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(10px, 15px);
+            }
+            50% {
+                transform: translate(20px, 5px);
+            }
+            75% {
+                transform: translate(10px, 15px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating icons background -->
+    <div class="floating-icons">
+        <div class="floating-icon"><i class="fas fa-microchip"></i></div>
+        <div class="floating-icon"><i class="fas fa-bolt"></i></div>
+        <div class="floating-icon"><i class="fas fa-plug"></i></div>
+        <div class="floating-icon"><i class="fas fa-server"></i></div>
+        <div class="floating-icon"><i class="fas fa-robot"></i></div>
+        <div class="floating-icon"><i class="fas fa-cog"></i></div>
+        <div class="floating-icon"><i class="fas fa-circuit-board"></i></div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-bolt"></i>
+            <h2>Instituto Técnico</h2>
+        </div>
+        
+        <div class="sidebar-menu">
+            <div class="menu-title">MENÚ PRINCIPAL</div>
+            <a href="/3/colaborador/dashboarddocente.html" class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/3/colaborador/cursosdocente.html" class="menu-item">
+                <i class="fas fa-book"></i>
+                <span>Mis cursos</span>
+            </a>
+            <a href="/3/colaborador/calificacionesdocente.html" class="menu-item">
+                <i class="fas fa-tasks"></i>
+                <span>Tareas y Evaluaciones</span>
+            </a>
+            
+            <div class="menu-title">ESPECIALIDADES</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-plug"></i>
+                <span>Sistemas Eléctricos</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-microchip"></i>
+                <span>Electrónica Industrial</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-project-diagram"></i>
+                <span>Controladores Lógicos</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-cogs"></i>
+                <span>Automatización</span>
+            </a>
+            
+            <div class="menu-title">CONFIGURACIÓN</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Ajustes</span>
+            </a>
+            <a href="/3/proyecto3.html" class="menu-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-check-circle"></i> Calificación de Trabajos</h1>
+                <p>Especialidad en Sistemas Eléctricos y Electrónicos</p>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar estudiantes, trabajos...">
+                </div>
+                
+                <div class="user-profile">
+                    <div class="avatar">RM</div>
+                    <div class="user-info">
+                        <div class="name">Ricardo Mendoza</div>
+                        <div class="role">Docente - Ciclo IV</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h2>Calificación de Trabajos</h2>
+            <p>Revise las entregas de los estudiantes, asigne calificaciones y proporcione retroalimentación.</p>
+        </div>
+        
+        <!-- Course Selector -->
+        <div class="course-selector">
+            <div class="selector-header">
+                <h2><i class="fas fa-book-open"></i> Seleccionar Curso</h2>
+                <div class="select-group">
+                    <label for="course-select">Curso:</label>
+                    <select id="course-select">
+                        <option value="">Seleccione un curso</option>
+                        <option value="1">Instalaciones Eléctricas - Grupo A</option>
+                        <option value="2">Electrónica Digital - Grupo B</option>
+                        <option value="3">Programación de PLCs - Grupo C</option>
+                        <option value="4">Sistemas Embebidos - Grupo D</option>
+                        <option value="5">Automatización Industrial - Grupo E</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="select-group">
+                <label for="assignment-select">Tarea/Evaluación:</label>
+                <select id="assignment-select">
+                    <option value="">Seleccione una tarea</option>
+                    <option value="1">Proyecto Final - Instalaciones Trifásicas</option>
+                    <option value="2">Examen Parcial - Circuitos Digitales</option>
+                    <option value="3">Práctica de Laboratorio - PLCs</option>
+                    <option value="4">Tarea 3 - Microcontroladores</option>
+                    <option value="5">Evaluación Continua - Automatización</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Students List -->
+        <div class="students-container">
+            <div class="students-header">
+                <h2><i class="fas fa-users"></i> Estudiantes</h2>
+                <div class="file-upload">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-file-export"></i> Exportar Calificaciones
+                    </button>
+                </div>
+            </div>
+            
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Entrega</th>
+                        <th>Calificación</th>
+                        <th>Retroalimentación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">JL</div>
+                                <div>
+                                    <div class="student-name">Juan López</div>
+                                    <div class="student-code">2023-001</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="file-upload">
+                                <button class="file-upload-btn" title="Descargar entrega">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <span class="file-name">proyecto_trifasico.pdf</span>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" class="grade-input" min="0" max="20" step="0.5" value="15.5">
+                        </td>
+                        <td>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">MP</div>
+                                <div>
+                                    <div class="student-name">María Pérez</div>
+                                    <div class="student-code">2023-002</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="file-upload">
+                                <button class="file-upload-btn" title="Descargar entrega">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <span class="file-name">circuitos_digitales.zip</span>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" class="grade-input" min="0" max="20" step="0.5" value="18.0">
+                        </td>
+                        <td>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">CG</div>
+                                <div>
+                                    <div class="student-name">Carlos Gómez</div>
+                                    <div class="student-code">2023-003</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="file-upload">
+                                <button class="file-upload-btn" title="Descargar entrega">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <span class="file-name">plc_programa.rsc</span>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" class="grade-input" min="0" max="20" step="0.5" value="12.5">
+                        </td>
+                        <td>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">AS</div>
+                                <div>
+                                    <div class="student-name">Ana Sánchez</div>
+                                    <div class="student-code">2023-004</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="file-upload">
+                                <button class="file-upload-btn" title="Descargar entrega">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <span class="file-name">microcontrolador.ino</span>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" class="grade-input" min="0" max="20" step="0.5" value="17.0">
+                        </td>
+                        <td>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">RM</div>
+                                <div>
+                                    <div class="student-name">Roberto Martínez</div>
+                                    <div class="student-code">2023-005</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="file-upload">
+                                <button class="file-upload-btn" title="Descargar entrega">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <span class="file-name">automatizacion.docx</span>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="number" class="grade-input" min="0" max="20" step="0.5" value="14.0">
+                        </td>
+                        <td>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-comment"></i> Agregar
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Assignment Details -->
+        <div class="assignment-container">
+            <div class="assignment-header">
+                <h2><i class="fas fa-info-circle"></i> Detalles de la Tarea</h2>
+            </div>
+            
+            <div class="assignment-details">
+                <div class="detail-card">
+                    <h3>Fecha de Asignación</h3>
+                    <p>15 Junio 2023</p>
+                </div>
+                <div class="detail-card">
+                    <h3>Fecha de Entrega</h3>
+                    <p>28 Junio 2023</p>
+                </div>
+                <div class="detail-card">
+                    <h3>Estudiantes</h3>
+                    <p>18 matriculados</p>
+                </div>
+                <div class="detail-card">
+                    <h3>Entregas Recibidas</h3>
+                    <p>15/18 (83%)</p>
+                </div>
+                <div class="detail-card">
+                    <h3>Promedio Actual</h3>
+                    <p>15.4</p>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-outline">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+                <button class="btn btn-primary" id="save-grades">
+                    <i class="fas fa-save"></i> Guardar Calificaciones
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulación de funcionalidad del menú
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Simular guardado de calificaciones
+        document.getElementById('save-grades').addEventListener('click', function(e) {
+            e.preventDefault();
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
+                this.style.backgroundColor = '#10b981';
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.disabled = false;
+                    this.style.backgroundColor = '';
+                    alert('Calificaciones guardadas exitosamente');
+                }, 2000);
+            }, 1500);
+        });
+        
+        // Simular descarga de archivos
+        document.querySelectorAll('.file-upload-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const fileName = this.nextElementSibling.textContent;
+                alert(`Descargando archivo: ${fileName}`);
+            });
+        });
+        
+        // Simular cambio de curso
+        document.getElementById('course-select').addEventListener('change', function() {
+            if(this.value) {
+                alert(`Curso seleccionado: ${this.options[this.selectedIndex].text}`);
+            }
+        });
+        
+        // Simular cambio de tarea
+        document.getElementById('assignment-select').addEventListener('change', function() {
+            if(this.value) {
+                alert(`Tarea seleccionada: ${this.options[this.selectedIndex].text}`);
+            }
+        });
+    </script>
+</body>
+</html>
