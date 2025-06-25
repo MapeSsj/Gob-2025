@@ -699,8 +699,8 @@
                 html2canvas(pdfContainer).then(canvas => {
                     const imgData = canvas.toDataURL('../img/Usuario.jpg');
                     const pdf = new jsPDF('p', 'mm', 'a4');
-                    const imgWidth = 30; // A4 width in mm
-                    const pageHeight = 25; // A4 height in mm
+                    const imgWidth = 200; // A4 width in mm
+                    const pageHeight = 300; // A4 height in mm
                     const imgHeight = canvas.height * imgWidth / canvas.width;
                     let heightLeft = imgHeight;
                     let position = 0;
