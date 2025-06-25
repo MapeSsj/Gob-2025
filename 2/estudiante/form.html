@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo de Encuestas | Institución</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: rgba(67, 97, 238, 0.1);
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f72585;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --survey-color: #4361ee;
+
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+        }
+        
+        /* Layout Principal */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to right, var(--survey-color), #560bad);
+        }
+        
+        .sidebar-header img {
+            height: 40px;
+        }
+        
+        .sidebar-menu {
+            padding: 1.5rem;
+        }
+        
+        .menu-title {
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            color: var(--survey-color);
+        }
+        
+        .menu-item:hover {
+            background-color: var(--survey-light);
+            color: var(--survey-color);
+        }
+        
+        .menu-item.active {
+            background-color: var(--survey-color);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .menu-item.active i {
+            color: white;
+        }
+        
+        .menu-badge {
+            margin-left: auto;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Top Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+        
+        .search-bar {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 2px solid var(--light-gray);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar input:focus {
+            border-color: var(--survey-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(114, 9, 183, 0.2);
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-right: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.6rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid var(--survey-light);
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--survey-color);
+            font-weight: 600;
+        }
+        
+        /* Content Area */
+        .content-area {
+            padding: 2rem;
+        }
+        
+        .welcome-section {
+            background: linear-gradient(135deg, var(--survey-color), #560bad);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -40px;
+            right: -40px;
+        }
+        
+        .welcome-section h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-section p {
+            opacity: 0.9;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+            font-size: 0.9rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: var(--survey-color);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--survey-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Surveys List */
+        .surveys-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .survey-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--survey-color);
+        }
+        
+        .survey-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .survey-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            position: relative;
+        }
+        
+        .survey-category {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--survey-light);
+            color: var(--survey-color);
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        
+        .survey-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .survey-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .survey-meta {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .survey-meta i {
+            margin-right: 5px;
+        }
+        
+        .survey-meta span {
+            margin-right: 15px;
+        }
+        
+        .survey-progress {
+            height: 5px;
+            background-color: var(--light-gray);
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--survey-color);
+            border-radius: 5px;
+            width: 65%;
+        }
+        
+        .survey-footer {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9fafb;
+        }
+        
+        .survey-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .survey-status.pending {
+            color: var(--warning);
+        }
+        
+        .survey-status.completed {
+            color: var(--success);
+        }
+        
+        .survey-status.expired {
+            color: var(--danger);
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--survey-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #560bad;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(114, 9, 183, 0.3);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--survey-color);
+            color: var(--survey-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--survey-light);
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.75rem;
+        }
+        
+        /* Survey Form */
+        .survey-form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .survey-header-info {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .survey-form-title {
+            font-size: 1.5rem;
+            color: var(--survey-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .survey-form-description {
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .question-group {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background-color: #f9fafb;
+            border-left: 3px solid var(--survey-color);
+        }
+        
+        .question-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .question-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        .option-item:hover {
+            border-color: var(--survey-color);
+            background-color: var(--survey-light);
+        }
+        
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .option-text {
+            flex: 1;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .text-input:focus {
+            border-color: var(--survey-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(114, 9, 183, 0.2);
+        }
+        
+        .rating-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .rating-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.8rem;
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .rating-item:hover, .rating-item.selected {
+            background-color: var(--survey-light);
+            border-color: var(--survey-color);
+            color: var(--survey-color);
+            font-weight: 600;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--light-gray);
+        }
+        
+        /* Survey Results */
+        .survey-results-container {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .results-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .results-title {
+            font-size: 1.5rem;
+            color: var(--survey-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .results-meta {
+            display: flex;
+            gap: 1.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .results-meta-item i {
+            margin-right: 5px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            height: 350px;
+        }
+        
+        .question-results {
+            margin-bottom: 2.5rem;
+        }
+        
+        .question-results-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+        
+        .responses-count {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .answer-card {
+            padding: 1.2rem;
+            border-radius: 10px;
+            background: #f9fafb;
+            border-left: 3px solid var(--survey-color);
+        }
+        
+        .answer-text {
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+        
+        .answer-date {
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-align: right;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 80px;
+                overflow: hidden;
+            }
+            
+            .sidebar-header span, 
+            .menu-item span:not(.menu-badge) {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+            
+            .menu-badge {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .surveys-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            
+            .search-bar {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+            
+            .tab {
+                padding: 0.8rem 1rem;
+                white-space: nowrap;
+            }
+            
+            .survey-results-container {
+                padding: 1rem;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="/2/img/logoInstituto.png" alt="Logo Institucional">
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-title">Navegación</div>
+                
+                <a href="/2/estudiante/student.html" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                
+                <a href="/2/estudiante/form.html" class="menu-item active">
+                    <i class="fas fa-poll"></i>
+                    <span>Encuestas</span>
+                    <span class="menu-badge">3</span>
+                </a>
+                
+                
+                <div class="menu-title">Configuración</div>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Perfil</span>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notificaciones</span>
+                </a>
+                
+                <a href="/2/proyecto2.html" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar encuestas...">
+                </div>
+                
+                <div class="user-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">2</span>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Avatar" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name">María González</span>
+                            <span class="user-role">Estudiante</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Welcome Section -->
+                <section class="welcome-section">
+                    <h1>Módulo de Encuestas</h1>
+                    <p>Participa en encuestas institucionales y contribuye al mejoramiento continuo</p>
+                </section>
+                
+                <!-- Tabs -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="list">Listado</div>
+                    <div class="tab" data-tab="form">Responder Encuesta</div>
+                    <div class="tab" data-tab="results">Resultados</div>
+                </div>
+                
+                <!-- Surveys List Tab -->
+                <div class="tab-content active" id="list-tab">
+                    <div class="filters" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                        <select class="text-input" style="flex: 1;">
+                            <option>Todas las categorías</option>
+                            <option>Educación</option>
+                            <option>Infraestructura</option>
+                            <option>Bienestar</option>
+                            <option>Recursos</option>
+                        </select>
+                        <select class="text-input" style="flex: 1;">
+                            <option>Todos los estados</option>
+                            <option>Pendientes</option>
+                            <option>Completadas</option>
+                            <option>Vencidas</option>
+                        </select>
+                        <button class="btn btn-outline">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                    </div>
+                    
+                    <div class="surveys-grid">
+                        <div class="survey-card animate-card delay-1">
+                            <div class="survey-header">
+                                <span class="survey-category">Educación</span>
+                                <h3 class="survey-title">Satisfacción con Docentes</h3>
+                                <p class="survey-description">Encuesta anónima para evaluar el desempeño de los docentes este semestre</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 2 días</span>
+                                    <span><i class="far fa-clock"></i> 5 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-pen"></i> Responder
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card animate-card delay-2">
+                            <div class="survey-header">
+                                <span class="survey-category">Infraestructura</span>
+                                <h3 class="survey-title">Evaluación de Aulas</h3>
+                                <p class="survey-description">Valora las condiciones de las aulas y laboratorios del campus</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 5 días</span>
+                                    <span><i class="far fa-clock"></i> 3 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-pen"></i> Responder
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card animate-card delay-3">
+                            <div class="survey-header">
+                                <span class="survey-category">Bienestar</span>
+                                <h3 class="survey-title">Servicios de Cafetería</h3>
+                                <p class="survey-description">Opinión sobre calidad y variedad de alimentos en la cafetería</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 7 días</span>
+                                    <span><i class="far fa-clock"></i> 4 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-pen"></i> Responder
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card animate-card delay-4">
+                            <div class="survey-header">
+                                <span class="survey-category">Recursos</span>
+                                <h3 class="survey-title">Biblioteca Digital</h3>
+                                <p class="survey-description">Encuesta sobre recursos y servicios de la biblioteca digital</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 1 día</span>
+                                    <span><i class="far fa-clock"></i> 6 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status completed">Completada</span>
+                                <button class="btn btn-outline">
+                                    <i class="fas fa-chart-bar"></i> Ver Resultados
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card">
+                            <div class="survey-header">
+                                <span class="survey-category">Educación</span>
+                                <h3 class="survey-title">Plataforma Virtual</h3>
+                                <p class="survey-description">Evaluación de la experiencia en la plataforma de aprendizaje virtual</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 10 días</span>
+                                    <span><i class="far fa-clock"></i> 7 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-pen"></i> Responder
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card">
+                            <div class="survey-header">
+                                <span class="survey-category">Bienestar</span>
+                                <h3 class="survey-title">Actividades Extracurriculares</h3>
+                                <p class="survey-description">Encuesta sobre interés en actividades extracurriculares</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 15 días</span>
+                                    <span><i class="far fa-clock"></i> 4 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-pen"></i> Responder
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-history"></i> Ver encuestas anteriores
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Survey Form Tab -->
+                <div class="tab-content" id="form-tab">
+                    <div class="survey-form-container">
+                        <div class="survey-header-info">
+                            <h2 class="survey-form-title">Satisfacción con Docentes</h2>
+                            <p class="survey-form-description">Encuesta anónima para evaluar el desempeño de los docentes este semestre. Tus respuestas nos ayudarán a mejorar la calidad educativa.</p>
+                            <div class="survey-meta">
+                                <span><i class="far fa-calendar-alt"></i> Vence en 2 días</span>
+                                <span><i class="far fa-clock"></i> Tiempo estimado: 5 min</span>
+                                <span><i class="fas fa-user-shield"></i> Respuestas anónimas</span>
+                            </div>
+                        </div>
+                        
+                        <form id="surveyForm">
+                            <!-- Question 1 -->
+                            <div class="question-group">
+                                <h3 class="question-title">1. ¿Cómo calificarías la claridad en las explicaciones del docente?</h3>
+                                <p class="question-description">Considera la forma en que el docente presenta los temas y resuelve dudas</p>
+                                
+                                <div class="options-container">
+                                    <label class="option-item">
+                                        <input type="radio" name="q1" value="excelente">
+                                        <span class="option-text">Excelente - Siempre explica con claridad</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="radio" name="q1" value="buena">
+                                        <span class="option-text">Buena - Generalmente explica bien</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="radio" name="q1" value="regular">
+                                        <span class="option-text">Regular - A veces es difícil entender</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="radio" name="q1" value="deficiente">
+                                        <span class="option-text">Deficiente - Casi nunca se entienden las explicaciones</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 2 -->
+                            <div class="question-group">
+                                <h3 class="question-title">2. ¿El docente demuestra dominio del tema?</h3>
+                                <p class="question-description">Considera el conocimiento que muestra sobre la materia</p>
+                                
+                                <div class="options-container">
+                                    <label class="option-item">
+                                        <input type="radio" name="q2" value="siempre">
+                                        <span class="option-text">Siempre</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="radio" name="q2" value="frecuentemente">
+                                        <span class="option-text">Frecuentemente</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="radio" name="q2" value="ocasionalmente">
+                                        <span class="option-text">Ocasionalmente</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="radio" name="q2" value="nunca">
+                                        <span class="option-text">Nunca</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 3 -->
+                            <div class="question-group">
+                                <h3 class="question-title">3. Califica la disponibilidad del docente para atender consultas fuera de clase</h3>
+                                <p class="question-description">Considera horarios de consulta, respuesta a correos, etc.</p>
+                                
+                                <div class="rating-container">
+                                    <div class="rating-item" data-value="1">1 - Muy deficiente</div>
+                                    <div class="rating-item" data-value="2">2 - Deficiente</div>
+                                    <div class="rating-item" data-value="3">3 - Regular</div>
+                                    <div class="rating-item" data-value="4">4 - Buena</div>
+                                    <div class="rating-item" data-value="5">5 - Excelente</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 4 -->
+                            <div class="question-group">
+                                <h3 class="question-title">4. ¿Qué aspectos consideras que el docente debería mejorar?</h3>
+                                <p class="question-description">Selecciona todas las opciones que apliquen</p>
+                                
+                                <div class="options-container">
+                                    <label class="option-item">
+                                        <input type="checkbox" name="q4" value="explicaciones">
+                                        <span class="option-text">Claridad en las explicaciones</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="checkbox" name="q4" value="materiales">
+                                        <span class="option-text">Calidad de materiales de apoyo</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="checkbox" name="q4" value="evaluaciones">
+                                        <span class="option-text">Forma de evaluación</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="checkbox" name="q4" value="disponibilidad">
+                                        <span class="option-text">Disponibilidad para consultas</span>
+                                    </label>
+                                    <label class="option-item">
+                                        <input type="checkbox" name="q4" value="tecnologia">
+                                        <span class="option-text">Uso de tecnología</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Question 5 -->
+                            <div class="question-group">
+                                <h3 class="question-title">5. ¿Tienes algún comentario o sugerencia adicional?</h3>
+                                <p class="question-description">Comparte tus ideas para mejorar la experiencia de aprendizaje</p>
+                                
+                                <textarea class="text-input" rows="4" placeholder="Escribe tus comentarios aquí..."></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-outline">
+                                    <i class="fas fa-save"></i> Guardar y continuar después
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Enviar encuesta
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Survey Results Tab -->
+                <div class="tab-content" id="results-tab">
+                    <div class="survey-results-container">
+                        <div class="results-header">
+                            <h2 class="results-title">Resultados: Satisfacción con Docentes</h2>
+                            <div class="results-meta">
+                                <div class="results-meta-item">
+                                    <i class="far fa-calendar-alt"></i> Realizada: 15 Nov - 30 Nov 2023
+                                </div>
+                                <div class="results-meta-item">
+                                    <i class="fas fa-users"></i> Participantes: 842
+                                </div>
+                                <div class="results-meta-item">
+                                    <i class="fas fa-user-shield"></i> Respuestas anónimas
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <canvas id="overallChart"></canvas>
+                        </div>
+                        
+                        <!-- Question 1 Results -->
+                        <div class="question-results">
+                            <h3 class="question-results-title">1. ¿Cómo calificarías la claridad en las explicaciones del docente?</h3>
+                            <p class="responses-count">842 respuestas</p>
+                            
+                            <div class="chart-container">
+                                <canvas id="q1Chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 2 Results -->
+                        <div class="question-results">
+                            <h3 class="question-results-title">2. ¿El docente demuestra dominio del tema?</h3>
+                            <p class="responses-count">842 respuestas</p>
+                            
+                            <div class="chart-container">
+                                <canvas id="q2Chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 3 Results -->
+                        <div class="question-results">
+                            <h3 class="question-results-title">3. Califica la disponibilidad del docente para atender consultas fuera de clase</h3>
+                            <p class="responses-count">842 respuestas</p>
+                            
+                            <div class="chart-container">
+                                <canvas id="q3Chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Question 5 Results -->
+                        <div class="question-results">
+                            <h3 class="question-results-title">5. ¿Tienes algún comentario o sugerencia adicional?</h3>
+                            <p class="responses-count">723 respuestas</p>
+                            
+                            <div class="answers-grid">
+                                <div class="answer-card">
+                                    <p class="answer-text">Me gustaría que los profesores usen más ejemplos prácticos en clase, especialmente en matemáticas.</p>
+                                    <div class="answer-date">28 Nov 2023</div>
+                                </div>
+                                <div class="answer-card">
+                                    <p class="answer-text">Sería bueno que tuvieran horarios de consulta más amplios, a veces es difícil coincidir con mis horarios.</p>
+                                    <div class="answer-date">27 Nov 2023</div>
+                                </div>
+                                <div class="answer-card">
+                                    <p class="answer-text">Algunos profesores podrían mejorar la organización de los materiales en la plataforma virtual.</p>
+                                    <div class="answer-date">26 Nov 2023</div>
+                                </div>
+                                <div class="answer-card">
+                                    <p class="answer-text">En general estoy satisfecho, pero sugeriría más retroalimentación sobre los trabajos entregados.</p>
+                                    <div class="answer-date">25 Nov 2023</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 2rem;">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-file-pdf"></i> Exportar a PDF
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-file-excel"></i> Exportar a Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Tabs functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Rating selection
+        document.querySelectorAll('.rating-item').forEach(item => {
+            item.addEventListener('click', function() {
+                // Remove selected class from siblings
+                this.parentElement.querySelectorAll('.rating-item').forEach(i => {
+                    i.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked item
+                this.classList.add('selected');
+            });
+        });
+        
+        // Survey form submission
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success message
+            alert('¡Gracias por completar la encuesta! Tus respuestas han sido registradas.');
+            
+            // Redirect to list
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('[data-tab="list"]').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('list-tab').classList.add('active');
+        });
+        
+        // Initialize charts
+        function initCharts() {
+            // Overall satisfaction chart
+            const overallCtx = document.getElementById('overallChart').getContext('2d');
+            const overallChart = new Chart(overallCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excelente', 'Buena', 'Regular', 'Deficiente'],
+                    datasets: [{
+                        data: [45, 35, 15, 5],
+                        backgroundColor: [
+                            '#4cc9f0',
+                            '#4895ef',
+                            '#f8961e',
+                            '#f72585'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Satisfacción General',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    return `${label}: ${value}%`;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+            
+            // Question 1 chart
+            const q1Ctx = document.getElementById('q1Chart').getContext('2d');
+            const q1Chart = new Chart(q1Ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Excelente', 'Buena', 'Regular', 'Deficiente'],
+                    datasets: [{
+                        label: 'Respuestas',
+                        data: [320, 290, 150, 82],
+                        backgroundColor: '#7209b7',
+                        borderWidth: 0,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Claridad en las explicaciones',
+                            font: {
+                                size: 14
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Question 2 chart
+            const q2Ctx = document.getElementById('q2Chart').getContext('2d');
+            const q2Chart = new Chart(q2Ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Siempre', 'Frecuentemente', 'Ocasionalmente', 'Nunca'],
+                    datasets: [{
+                        data: [55, 30, 10, 5],
+                        backgroundColor: [
+                            '#4cc9f0',
+                            '#4895ef',
+                            '#f8961e',
+                            '#f72585'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Dominio del tema',
+                            font: {
+                                size: 14
+                            }
+                        },
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+            
+            // Question 3 chart
+            const q3Ctx = document.getElementById('q3Chart').getContext('2d');
+            const q3Chart = new Chart(q3Ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1 - Muy deficiente', '2 - Deficiente', '3 - Regular', '4 - Buena', '5 - Excelente'],
+                    datasets: [{
+                        label: 'Calificaciones',
+                        data: [40, 65, 120, 280, 337],
+                        backgroundColor: 'rgba(114, 9, 183, 0.1)',
+                        borderColor: '#7209b7',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Disponibilidad para consultas',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize charts when results tab is shown
+        document.querySelector('[data-tab="results"]').addEventListener('click', function() {
+            setTimeout(initCharts, 300);
+        });
+        
+        // Notification badge animation
+        const notificationBadge = document.querySelector('.notification-badge');
+        setInterval(() => {
+            notificationBadge.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                notificationBadge.style.transform = 'scale(1)';
+            }, 300);
+        }, 5000);
+    </script>
+</body>
+</html>

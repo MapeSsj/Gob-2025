@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Docente | Institución</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: rgba(67, 97, 238, 0.1);
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f72585;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --teacher-color: #7209b7;
+            --teacher-light: rgba(114, 9, 183, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+        }
+        
+        /* Layout Principal */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to right, var(--teacher-color), #560bad);
+        }
+        
+        .sidebar-header img {
+            height: 40px;
+
+        }
+        
+        .sidebar-menu {
+            padding: 1.5rem;
+        }
+        
+        .menu-title {
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+            color: var(--teacher-color);
+        }
+        
+        .menu-item:hover {
+            background-color: var(--teacher-light);
+            color: var(--teacher-color);
+        }
+        
+        .menu-item.active {
+            background-color: var(--teacher-color);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .menu-item.active i {
+            color: white;
+        }
+        
+        .menu-badge {
+            margin-left: auto;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Top Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+        
+        .search-bar {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 2px solid var(--light-gray);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar input:focus {
+            border-color: var(--teacher-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(114, 9, 183, 0.2);
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-right: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.6rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid var(--teacher-light);
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--teacher-color);
+            font-weight: 600;
+        }
+        
+        /* Content Area */
+        .content-area {
+            padding: 2rem;
+        }
+        
+        .welcome-section {
+            background: linear-gradient(135deg, var(--teacher-color), #560bad);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -50px;
+            right: -50px;
+        }
+        
+        .welcome-section h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-section p {
+            opacity: 0.9;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 4px;
+            width: 100%;
+            background-color: var(--teacher-color);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+            background-color: var(--teacher-light);
+            color: var(--teacher-color);
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-change {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        .stat-change i {
+            margin-right: 3px;
+        }
+        
+        /* Surveys Section */
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            color: var(--teacher-color);
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--teacher-color);
+        }
+        
+        .surveys-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .survey-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--teacher-color);
+        }
+        
+        .survey-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .survey-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            position: relative;
+        }
+        
+        .survey-category {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--teacher-light);
+            color: var(--teacher-color);
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        
+        .survey-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .survey-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .survey-meta {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .survey-meta i {
+            margin-right: 5px;
+        }
+        
+        .survey-meta span {
+            margin-right: 15px;
+        }
+        
+        .survey-progress {
+            height: 5px;
+            background-color: var(--light-gray);
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--teacher-color);
+            border-radius: 5px;
+            width: 65%;
+        }
+        
+        .survey-footer {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9fafb;
+        }
+        
+        .survey-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .survey-status.pending {
+            color: var(--warning);
+        }
+        
+        .survey-status.completed {
+            color: var(--success);
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--teacher-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #560bad;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(114, 9, 183, 0.3);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--teacher-color);
+            color: var(--teacher-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--teacher-light);
+        }
+        
+        /* Tickets Section */
+        .tickets-table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background-color: #f8f9fa;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--light-gray);
+            font-size: 0.9rem;
+        }
+        
+        .ticket-id {
+            color: var(--teacher-color);
+            font-weight: 600;
+        }
+        
+        .ticket-priority {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .priority-high {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .priority-medium {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .priority-low {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .ticket-status {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .status-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .status-pending {
+            background-color: var(--warning);
+        }
+        
+        .status-in-progress {
+            background-color: var(--accent);
+        }
+        
+        .status-resolved {
+            background-color: var(--success);
+        }
+        
+        .ticket-actions i {
+            color: var(--gray);
+            margin-left: 10px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .ticket-actions i:hover {
+            color: var(--teacher-color);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 80px;
+                overflow: hidden;
+            }
+            
+            .sidebar-header span, 
+            .menu-item span:not(.menu-badge) {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+            
+            .menu-badge {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .surveys-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            
+            .search-bar {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            height: 350px;
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--teacher-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(114, 9, 183, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+        
+        .fab:hover {
+            background-color: #560bad;
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(114, 9, 183, 0.4);
+        }
+        
+        /* Courses Section */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--teacher-color);
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-header {
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .course-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--teacher-color);
+        }
+        
+        .course-schedule {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .course-meta {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .course-meta i {
+            margin-right: 5px;
+        }
+        
+        .course-meta span {
+            margin-right: 15px;
+        }
+        
+        .course-footer {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="/2/img/logoInstituto.png" alt="Logo Institucional">
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-title">Navegación</div>
+                
+                <a href="#" class="menu-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Mis Cursos</span>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-poll"></i>
+                    <span>Encuestas</span>
+                    <span class="menu-badge">2</span>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Mis Tickets</span>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Reportes</span>
+                </a>
+                
+                <div class="menu-title">Configuración</div>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Perfil</span>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notificaciones</span>
+                </a>
+                
+                <a href="/2/proyecto2.html" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar cursos, encuestas...">
+                </div>
+                
+                <div class="user-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">1</span>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Avatar" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name">Carlos Mendoza</span>
+                            <span class="user-role">Docente</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Welcome Section -->
+                <section class="welcome-section animate__animated animate__fadeIn">
+                    <h1>Bienvenido, Profesor Mendoza</h1>
+                    <p>Aquí puedes gestionar tus cursos, ver resultados de encuestas, reportar incidencias y acceder a reportes institucionales.</p>
+                </section>
+                
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card animate-card delay-1">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div>
+                                <div class="stat-title">Cursos Activos</div>
+                                <div class="stat-value">4</div>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>1 nuevo este semestre</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card animate-card delay-2">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-poll-h"></i>
+                            </div>
+                            <div>
+                                <div class="stat-title">Encuestas Pendientes</div>
+                                <div class="stat-value">2</div>
+                                <div class="stat-change negative">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>1 con vencimiento cercano</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card animate-card delay-3">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <div class="stat-title">Satisfacción Estudiantil</div>
+                                <div class="stat-value">86%</div>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>2% más que el promedio</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card animate-card delay-4">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <div>
+                                <div class="stat-title">Tickets Activos</div>
+                                <div class="stat-value">1</div>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>1 resuelto recientemente</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Courses Section -->
+                <section>
+                    <h2 class="section-title">
+                        <i class="fas fa-book"></i>
+                        Mis Cursos
+                    </h2>
+                    
+                    <div class="courses-grid">
+                        <div class="course-card">
+                            <div class="course-header">
+                                <h3 class="course-title">Matemáticas Avanzadas</h3>
+                                <p class="course-schedule">Lunes y Miércoles, 10:00-12:00 | Aula B-204</p>
+                                
+                                <div class="course-meta">
+                                    <span><i class="fas fa-users"></i> 28 estudiantes</span>
+                                    <span><i class="fas fa-file-alt"></i> 3 evaluaciones pendientes</span>
+                                </div>
+                            </div>
+                            
+                            <div class="course-footer">
+                                <span class="survey-status">Semestre 2023-II</span>
+                                <button class="btn btn-outline">Ver Detalles</button>
+                            </div>
+                        </div>
+                        
+                        <div class="course-card">
+                            <div class="course-header">
+                                <h3 class="course-title">Física Aplicada</h3>
+                                <p class="course-schedule">Martes y Jueves, 14:00-16:00 | Laboratorio F-102</p>
+                                
+                                <div class="course-meta">
+                                    <span><i class="fas fa-users"></i> 32 estudiantes</span>
+                                    <span><i class="fas fa-file-alt"></i> 1 evaluación pendiente</span>
+                                </div>
+                            </div>
+                            
+                            <div class="course-footer">
+                                <span class="survey-status">Semestre 2023-II</span>
+                                <button class="btn btn-outline">Ver Detalles</button>
+                            </div>
+                        </div>
+                        
+                        <div class="course-card">
+                            <div class="course-header">
+                                <h3 class="course-title">Metodología de la Investigación</h3>
+                                <p class="course-schedule">Viernes, 9:00-12:00 | Aula A-305</p>
+                                
+                                <div class="course-meta">
+                                    <span><i class="fas fa-users"></i> 24 estudiantes</span>
+                                    <span><i class="fas fa-file-alt"></i> 5 proyectos en revisión</span>
+                                </div>
+                            </div>
+                            
+                            <div class="course-footer">
+                                <span class="survey-status">Semestre 2023-II</span>
+                                <button class="btn btn-outline">Ver Detalles</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Surveys Section -->
+                <section>
+                    <h2 class="section-title">
+                        <i class="fas fa-poll"></i>
+                        Encuestas Pendientes
+                    </h2>
+                    
+                    <div class="surveys-grid">
+                        <div class="survey-card">
+                            <div class="survey-header">
+                                <span class="survey-category">Evaluación</span>
+                                <h3 class="survey-title">Recursos Didácticos</h3>
+                                <p class="survey-description">Encuesta sobre la disponibilidad y calidad de recursos para enseñanza</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 3 días</span>
+                                    <span><i class="far fa-clock"></i> 7 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">Responder</button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card">
+                            <div class="survey-header">
+                                <span class="survey-category">Infraestructura</span>
+                                <h3 class="survey-title">Laboratorios y Aulas</h3>
+                                <p class="survey-description">Valoración de las instalaciones para actividades docentes</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 10 días</span>
+                                    <span><i class="far fa-clock"></i> 5 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">Responder</button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card">
+                            <div class="survey-header">
+                                <span class="survey-category">Desarrollo</span>
+                                <h3 class="survey-title">Necesidades de Capacitación</h3>
+                                <p class="survey-description">Identificación de áreas para desarrollo profesional docente</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 15 días</span>
+                                    <span><i class="far fa-clock"></i> 8 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">Responder</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Tickets Section -->
+                <section>
+                    <h2 class="section-title">
+                        <i class="fas fa-ticket-alt"></i>
+                        Mis Incidencias Recientes
+                    </h2>
+                    
+                    <div class="tickets-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Asunto</th>
+                                    <th>Categoría</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ticket-id">#TI-2023-078</td>
+                                    <td>Proyector no funciona en aula A-305</td>
+                                    <td>Equipos</td>
+                                    <td><span class="ticket-priority priority-high">Alta</span></td>
+                                    <td><span class="ticket-status"><span class="status-badge status-in-progress"></span> En revisión</span></td>
+                                    <td>22/11/2023</td>
+                                    <td class="ticket-actions">
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-comment"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ticket-id">#TI-2023-065</td>
+                                    <td>Solicitud de software especializado</td>
+                                    <td>Software</td>
+                                    <td><span class="ticket-priority priority-medium">Media</span></td>
+                                    <td><span class="ticket-status"><span class="status-badge status-resolved"></span> Resuelto</span></td>
+                                    <td>12/11/2023</td>
+                                    <td class="ticket-actions">
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-comment"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ticket-id">#TI-2023-051</td>
+                                    <td>Problema con acceso a repositorio académico</td>
+                                    <td>Sistemas</td>
+                                    <td><span class="ticket-priority priority-low">Baja</span></td>
+                                    <td><span class="ticket-status"><span class="status-badge status-pending"></span> Pendiente</span></td>
+                                    <td>05/11/2023</td>
+                                    <td class="ticket-actions">
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-comment"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nuevo Ticket
+                    </button>
+                </section>
+                
+                <!-- Satisfaction Chart -->
+                <section>
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Satisfacción Estudiantil
+                    </h2>
+                    
+                    <div class="chart-container">
+                        <canvas id="satisfactionChart"></canvas>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Floating Action Button -->
+            <button class="fab">
+                <i class="fas fa-plus"></i>
+            </button>
+        </main>
+    </div>
+
+    <script>
+        // Inicializar gráfico de satisfacción
+        const ctx = document.getElementById('satisfactionChart').getContext('2d');
+        const satisfactionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Matemáticas', 'Física', 'Met. Investigación', 'Estadística', 'Ética'],
+                datasets: [{
+                    label: 'Satisfacción Estudiantil (%)',
+                    data: [88, 92, 79, 85, 90],
+                    backgroundColor: '#7209b7',
+                    borderWidth: 0,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Satisfacción: ${context.raw}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Simular progreso al hacer clic en botones de encuesta
+        document.querySelectorAll('.survey-card .btn-primary').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const card = this.closest('.survey-card');
+                const progressBar = card.querySelector('.progress-bar');
+                const status = card.querySelector('.survey-status');
+                
+                // Simular progreso
+                let width = 0;
+                const interval = setInterval(() => {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                        
+                        // Cambiar estado
+                        status.textContent = 'Completada';
+                        status.classList.remove('pending');
+                        status.classList.add('completed');
+                        
+                        // Cambiar botón
+                        this.textContent = 'Ver Detalles';
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-outline');
+                    } else {
+                        width++;
+                        progressBar.style.width = width + '%';
+                    }
+                }, 20);
+            });
+        });
+        
+        // FAB Action - Crear nuevo ticket o encuesta
+        document.querySelector('.fab').addEventListener('click', function() {
+            alert('Crear nuevo ticket o recurso docente');
+        });
+        
+        // Notificación badge animation
+        const notificationBadge = document.querySelector('.notification-badge');
+        setInterval(() => {
+            notificationBadge.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                notificationBadge.style.transform = 'scale(1)';
+            }, 300);
+        }, 5000);
+        
+        // Simular carga de cursos
+        document.querySelectorAll('.course-card .btn-outline').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Redirigiendo a detalles del curso');
+            });
+        });
+    </script>
+</body>
+</html>

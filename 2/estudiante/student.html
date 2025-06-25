@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Estudiante | Institución</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: rgba(67, 97, 238, 0.1);
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #1b263b;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f72585;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+        }
+        
+        /* Layout Principal */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(to right, var(--survey-color), #560bad);
+        }
+        
+        .sidebar-header img {
+            height: 40px;
+        }
+        
+        .sidebar-menu {
+            padding: 1.5rem;
+        }
+        
+        .menu-title {
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .menu-item.active {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 500;
+        }
+        
+        .menu-item.active i {
+            color: white;
+        }
+        
+        .menu-badge {
+            margin-left: auto;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Top Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+        
+        .search-bar {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 2px solid var(--light-gray);
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-bar input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-right: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.6rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+            border: 2px solid var(--primary-light);
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        /* Content Area */
+        .content-area {
+            padding: 2rem;
+        }
+        
+        .welcome-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .welcome-section::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -50px;
+            right: -50px;
+        }
+        
+        .welcome-section h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .welcome-section p {
+            opacity: 0.9;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.surveys {
+            background-color: rgba(72, 149, 239, 0.1);
+            color: var(--accent);
+        }
+        
+        .stat-icon.tickets {
+            background-color: rgba(248, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .stat-icon.participation {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .stat-icon.deadline {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-change {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-change.positive {
+            color: var(--success);
+        }
+        
+        .stat-change.negative {
+            color: var(--danger);
+        }
+        
+        .stat-change i {
+            margin-right: 3px;
+        }
+        
+        /* Surveys Section */
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .surveys-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .survey-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .survey-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .survey-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            position: relative;
+        }
+        
+        .survey-category {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        
+        .survey-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .survey-description {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .survey-meta {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .survey-meta i {
+            margin-right: 5px;
+        }
+        
+        .survey-meta span {
+            margin-right: 15px;
+        }
+        
+        .survey-progress {
+            height: 5px;
+            background-color: var(--light-gray);
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 5px;
+            width: 65%;
+        }
+        
+        .survey-footer {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9fafb;
+        }
+        
+        .survey-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .survey-status.pending {
+            color: var(--warning);
+        }
+        
+        .survey-status.completed {
+            color: var(--success);
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+        }
+        
+        /* Tickets Section */
+        .tickets-table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background-color: #f8f9fa;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--light-gray);
+            font-size: 0.9rem;
+        }
+        
+        .ticket-id {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .ticket-priority {
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .priority-high {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .priority-medium {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .priority-low {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .ticket-status {
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .status-badge {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .status-pending {
+            background-color: var(--warning);
+        }
+        
+        .status-in-progress {
+            background-color: var(--accent);
+        }
+        
+        .status-resolved {
+            background-color: var(--success);
+        }
+        
+        .ticket-actions i {
+            color: var(--gray);
+            margin-left: 10px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .ticket-actions i:hover {
+            color: var(--primary);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 80px;
+                overflow: hidden;
+            }
+            
+            .sidebar-header span, 
+            .menu-item span:not(.menu-badge) {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 0.75rem;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+            
+            .menu-badge {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .surveys-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            
+            .search-bar {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+            
+            .user-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            height: 350px;
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+        
+        .fab:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="/2/img/logoInstituto.png" alt="Logo Institucional">
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-title">Navegación</div>
+                
+                <a href="/2/estudiante/student.html" class="menu-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                
+                <a href="/2/estudiante/form.html" class="menu-item">
+                    <i class="fas fa-poll"></i>
+                    <span>Encuestas</span>
+                    <span class="menu-badge">3</span>
+                </a>
+                
+                
+                <div class="menu-title">Configuración</div>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-user-cog"></i>
+                    <span>Perfil</span>
+                </a>
+                
+                <a href="#" class="menu-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Notificaciones</span>
+                </a>
+                
+                <a href="/2/proyecto2.html" class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Buscar en el sistema...">
+                </div>
+                
+                <div class="user-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">2</span>
+                    </button>
+                    
+                    <div class="user-profile">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Avatar" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name">María González</span>
+                            <span class="user-role">Estudiante</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Welcome Section -->
+                <section class="welcome-section animate__animated animate__fadeIn">
+                    <h1>Bienvenida, María</h1>
+                    <p>Aquí puedes gestionar tus encuestas pendientes, reportar incidencias y ver tu historial de participación en el sistema institucional.</p>
+                </section>
+                
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card animate-card delay-1">
+                        <div class="stat-header">
+                            <div class="stat-icon surveys">
+                                <i class="fas fa-poll"></i>
+                            </div>
+                            <div>
+                                <div class="stat-title">Encuestas Pendientes</div>
+                                <div class="stat-value">3</div>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>1 nueva esta semana</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card animate-card delay-2">
+                        <div class="stat-header">
+                            <div class="stat-icon tickets">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <div>
+                                <div class="stat-title">Tickets Activos</div>
+                                <div class="stat-value">2</div>
+                                <div class="stat-change negative">
+                                    <i class="fas fa-arrow-down"></i>
+                                    <span>1 resuelto recientemente</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card animate-card delay-3">
+                        <div class="stat-header">
+                            <div class="stat-icon participation">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div>
+                                <div class="stat-title">Participación</div>
+                                <div class="stat-value">78%</div>
+                                <div class="stat-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>5% más que el promedio</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card animate-card delay-4">
+                        <div class="stat-header">
+                            <div class="stat-icon deadline">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <div class="stat-title">Próximo Vencimiento</div>
+                                <div class="stat-value">2 días</div>
+                                <div class="stat-change negative">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>Encuesta "Satisfacción docente"</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Surveys Section -->
+                <section>
+                    <h2 class="section-title">
+                        <i class="fas fa-poll"></i>
+                        Encuestas Pendientes
+                    </h2>
+                    
+                    <div class="surveys-grid">
+                        <div class="survey-card">
+                            <div class="survey-header">
+                                <span class="survey-category">Educación</span>
+                                <h3 class="survey-title">Satisfacción con Docentes</h3>
+                                <p class="survey-description">Encuesta anónima para evaluar el desempeño de los docentes este semestre</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 2 días</span>
+                                    <span><i class="far fa-clock"></i> 5 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">Comenzar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card">
+                            <div class="survey-header">
+                                <span class="survey-category">Infraestructura</span>
+                                <h3 class="survey-title">Evaluación de Aulas</h3>
+                                <p class="survey-description">Valora las condiciones de las aulas y laboratorios del campus</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 5 días</span>
+                                    <span><i class="far fa-clock"></i> 3 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">Comenzar</button>
+                            </div>
+                        </div>
+                        
+                        <div class="survey-card">
+                            <div class="survey-header">
+                                <span class="survey-category">Bienestar</span>
+                                <h3 class="survey-title">Servicios de Cafetería</h3>
+                                <p class="survey-description">Opinión sobre calidad y variedad de alimentos en la cafetería</p>
+                                
+                                <div class="survey-meta">
+                                    <span><i class="far fa-calendar-alt"></i> Vence en 7 días</span>
+                                    <span><i class="far fa-clock"></i> 4 min</span>
+                                </div>
+                                
+                                <div class="survey-progress">
+                                    <div class="progress-bar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="survey-footer">
+                                <span class="survey-status pending">Pendiente</span>
+                                <button class="btn btn-primary">Comenzar</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Tickets Section -->
+                <section>
+                    <h2 class="section-title">
+                        <i class="fas fa-ticket-alt"></i>
+                        Mis Incidencias Recientes
+                    </h2>
+                    
+                    <div class="tickets-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Asunto</th>
+                                    <th>Categoría</th>
+                                    <th>Prioridad</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ticket-id">#TI-2023-045</td>
+                                    <td>Problema con acceso a plataforma virtual</td>
+                                    <td>Software</td>
+                                    <td><span class="ticket-priority priority-high">Alta</span></td>
+                                    <td><span class="ticket-status"><span class="status-badge status-in-progress"></span> En revisión</span></td>
+                                    <td>15/11/2023</td>
+                                    <td class="ticket-actions">
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-comment"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ticket-id">#TI-2023-038</td>
+                                    <td>Silla rota en aula B-204</td>
+                                    <td>Infraestructura</td>
+                                    <td><span class="ticket-priority priority-medium">Media</span></td>
+                                    <td><span class="ticket-status"><span class="status-badge status-resolved"></span> Resuelto</span></td>
+                                    <td>05/11/2023</td>
+                                    <td class="ticket-actions">
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-comment"></i>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="ticket-id">#TI-2023-027</td>
+                                    <td>Problema con conexión WiFi en biblioteca</td>
+                                    <td>Redes</td>
+                                    <td><span class="ticket-priority priority-low">Baja</span></td>
+                                    <td><span class="ticket-status"><span class="status-badge status-pending"></span> Pendiente</span></td>
+                                    <td>28/10/2023</td>
+                                    <td class="ticket-actions">
+                                        <i class="fas fa-eye"></i>
+                                        <i class="fas fa-comment"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button class="btn btn-outline">
+                        <i class="fas fa-plus"></i> Nuevo Ticket
+                    </button>
+                </section>
+                
+                <!-- Participation Chart -->
+                <section>
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Mi Participación
+                    </h2>
+                    
+                    <div class="chart-container">
+                        <canvas id="participationChart"></canvas>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Floating Action Button -->
+            <button class="fab">
+                <i class="fas fa-plus"></i>
+            </button>
+        </main>
+    </div>
+
+    <script>
+        // Inicializar gráfico de participación
+        const ctx = document.getElementById('participationChart').getContext('2d');
+        const participationChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completadas', 'Pendientes', 'Vencidas'],
+                datasets: [{
+                    data: [12, 3, 2],
+                    backgroundColor: [
+                        '#4cc9f0',
+                        '#4895ef',
+                        '#f72585'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+        
+        // Simular progreso al hacer clic en botones de encuesta
+        document.querySelectorAll('.survey-card .btn-primary').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const card = this.closest('.survey-card');
+                const progressBar = card.querySelector('.progress-bar');
+                const status = card.querySelector('.survey-status');
+                
+                // Simular progreso
+                let width = 0;
+                const interval = setInterval(() => {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                        
+                        // Cambiar estado
+                        status.textContent = 'Completada';
+                        status.classList.remove('pending');
+                        status.classList.add('completed');
+                        
+                        // Cambiar botón
+                        this.textContent = 'Ver Resultados';
+                        this.classList.remove('btn-primary');
+                        this.classList.add('btn-outline');
+                    } else {
+                        width++;
+                        progressBar.style.width = width + '%';
+                    }
+                }, 20);
+            });
+        });
+        
+        // FAB Action
+        document.querySelector('.fab').addEventListener('click', function() {
+            // Aquí puedes abrir un modal para nueva encuesta/ticket
+            alert('Crear nuevo ticket o encuesta');
+        });
+        
+        // Notificación badge animation
+        const notificationBadge = document.querySelector('.notification-badge');
+        setInterval(() => {
+            notificationBadge.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                notificationBadge.style.transform = 'scale(1)';
+            }, 300);
+        }, 5000);
+    </script>
+</body>
+</html>
