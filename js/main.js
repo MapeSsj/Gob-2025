@@ -6,7 +6,8 @@ function showProjectDetails(projectId) {
         "Sistema de Gestion de TI",
         "Aula Virtual",
         "Sistema de convenios de Practicas Pre Profesionales",
-        "Plataforma de formación continua en línea para docentes y egresados"
+        "Plataforma de formación continua en línea para docentes y egresados",
+        "Aplicación de Fortinet"
     ];
 
     const projectDescriptions = [
@@ -15,7 +16,8 @@ function showProjectDetails(projectId) {
         "Plataforma digital participativa para la gestión institucional de TI, que permite integrar la retroalimentación del personal docente, estudiantes y administrativos para la mejora continua. Funcionalidades principales:<br>☼ Registro de observaciones y sugerencias.<br>☼ Clasificación de entradas por usuario y categoría.<br>☼ Generación de reportes mensuales automatizados.<br>☼ Historial de acciones y seguimiento técnico.",
         "Aula virtual institucional diseñada para facilitar el acceso a clases, seguimiento académico y entrega de trabajos. Permite a los estudiantes y docentes gestionar el aprendizaje en línea. Funcionalidades principales:<br>☼ Subida de tareas y archivos por unidad.<br>☼ Consulta de calificaciones por asignatura.<br>☼ Seguimiento del progreso académico del estudiante.<br>☼ Interfaz amigable y adaptable a dispositivos móviles.",
         "Sistema de gestión de convenios para prácticas preprofesionales, orientado a registrar, evaluar y hacer seguimiento de experiencias formativas en empresas. Funcionalidades principales:<br>☼ Registro de convenios y empresas colaboradoras.<br>☼ Asignación de estudiantes y tutores responsables.<br>☼ Evaluación periódica del desempeño.<br>☼ Reportes por ciclo o periodo de prácticas.",
-        "Plataforma en línea para la formación continua de docentes y egresados, con un catálogo de cursos enfocados en temáticas tecnológicas. Funcionalidades principales:<br>☼ Acceso a más de 10 cursos virtuales especializados.<br>☼ Registro y progreso por usuario.<br>☼ Evaluación y constancia por curso aprobado.<br>☼ Actualización continua de contenidos formativos."
+        "Plataforma en línea para la formación continua de docentes y egresados, con un catálogo de cursos enfocados en temáticas tecnológicas. Funcionalidades principales:<br>☼ Acceso a más de 10 cursos virtuales especializados.<br>☼ Registro y progreso por usuario.<br>☼ Evaluación y constancia por curso aprobado.<br>☼ Actualización continua de contenidos formativos.",
+        "Este proyecto busca establecer un perímetro de seguridad robusto mediante la creación y gestión de VLANs separadas por función (académica, administrativa, invitados, etc.) y la aplicación de políticas de control de acceso, monitoreo de tráfico y detección de intrusiones en tiempo real. Con la implementación del firewall Fortinet, se espera reducir significativamente los incidentes de seguridad, mejorar la trazabilidad de las conexiones, y garantizar la continuidad operativa de los servicios críticos."
     ];
 
     // Crear el modal dinámicamente
@@ -34,7 +36,7 @@ function showProjectDetails(projectId) {
                                 </div>
                                 <div class="col-md-6">
                                     <h4>Detalles del Proyecto</h4>
-                                    <p>${projectDescriptions[projectId]}</p>
+                                    <p style="text-align: justify;">${projectDescriptions[projectId]}</p>
                                     <ul class="list-group list-group-flush">
                                         <li class="list-group-item"><strong>Presupuesto:</strong> $${(150 + projectId * 50).toLocaleString()} mil</li>
                                         <li class="list-group-item"><strong>Duración:</strong> ${9 + projectId} Semanas</li>

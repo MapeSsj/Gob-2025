@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Implementación de FortiGate-900G</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background-color: #c33;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .document-viewer {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.2em;
+        }
+        h2 {
+            color: #c33;
+            border-bottom: 2px solid #c33;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .phase {
+            margin-bottom: 30px;
+        }
+        .deliverables {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #c33;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        .institutional-logos {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        .institutional-logo {
+            max-width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="institutional-logos">
+                <img src="fortinet_logo.jpg" alt="IESREA" class="institutional-logo">
+                
+                <img src="rfa.png" alt="CHICLAYO" class="institutional-logo">
+            </div>
+            <h1>Implementación de FortiGate-900G</h1>
+            <p>Hoja de ruta para la implementación del firewall en la red institucional</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="document-viewer">
+            <h2>ROADMAP - HOJA DE RUTA - IMPLEMENTACIÓN DE FIREWALL FORTINET</h2>
+            <p>A continuación, se detalla la hoja de ruta para implementar un firewall Fortinet en la red institucional, con el objetivo de segmentar y proteger las VLAN académicas y administrativas, fortaleciendo la seguridad de la red y reducir los incidentes de acceso no autorizado.</p>
+
+            <div class="phase">
+                <h3>Fase 1: Evaluación y Planeación (Semana 1-2)</h3>
+                <table>
+                    <tr>
+                        <th>SEMANA</th>
+                        <th>ACTIVIDADES</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>
+                            <ul>
+                                <li>Revisión detallada de la infraestructura de red actual (diagrama de red, listado de dispositivos, configuración de VLANs existentes, rangos de IP, servicios críticos).</li>
+                                <li>Identificación de la segmentación de VLAN académicas y administrativas existentes.</li>
+                                <li>Análisis de requerimientos de seguridad para las VLANs académicas y administrativas (políticas de acceso, servicios permitidos/bloqueados, usuarios, etc.).</li>
+                                <li>Evaluación de modelos de firewall Fortinet adecuados según el tamaño de la red, ancho de banda y funcionalidades requeridas (VPN, IPS, filtrado web).</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>
+                            <ul>
+                                <li>Informe de análisis de red y vulnerabilidades actuales.</li>
+                                <li>Diseño de la arquitectura de red con el nuevo firewall (ubicación en la red, definición de nuevas VLANs si es necesario, estrategias de segmentación).</li>
+                                <li>Planificación de la migración de servicios y reglas de firewall existentes al nuevo Fortinet.</li>
+                                <li>Elaboración del plan de adquisición (modelo específico, licencias, soportes, cables).</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <div class="deliverables">
+                    <h4>Entregables:</h4>
+                    <ul>
+                        <li>Informe de relevamiento de infraestructura de red.</li>
+                        <li>Diseño de arquitectura de red con firewall (diagrama lógico y físico).</li>
+                        <li>Recomendación de modelo Fortinet y justificación.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="phase">
+                <h3>Fase 2: Adquisición y Preparación (Semana 3)</h3>
+                <table>
+                    <tr>
+                        <th>SEMANA</th>
+                        <th>ACTIVIDADES</th>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>
+                            <ul>
+                                <li>Compra y recepción del firewall Fortinet, licencias y componentes adicionales (módulos, transceptores, cables blindados).</li>
+                                <li>Revisión y configuración de Fortinet en un entorno de laboratorio (si es necesario).</li>
+                                <li>Configuración preliminar de IP estáticas y preparación de acceso remoto.</li>
+                                <li>Pruebas iniciales de conectividad y rendimiento del firewall en un entorno controlado.</li>
+                                <li>Preparación del espacio físico para la instalación (rack, energía, acondicionamiento).</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <div class="deliverables">
+                    <h4>Entregables:</h4>
+                    <ul>
+                        <li>Equipamiento Fortinet adquirido y verificado.</li>
+                        <li>Configuración inicial documentada.</li>
+                        <li>Manual de instalación para equipos.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="phase">
+                <h3>Fase 3: Instalación Física y Alineación (Semana 4-5)</h3>
+                <table>
+                    <tr>
+                        <th>SEMANA</th>
+                        <th>ACTIVIDADES</th>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>
+                            <ul>
+                                <li>Instalación física de Firewalls Fortinet en el centro de datos o ubicación indicada.</li>
+                                <li>Montaje y conexión de equipos a la red institucional.</li>
+                                <li>Configuración inicial de Firewall Fortinet (asignación de IPs, interfaces de red).</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>
+                            <ul>
+                                <li>Configuración de políticas de seguridad básicas (Accesos permitidos y bloqueados, reglas de firewall).</li>
+                                <li>Verificación de conectividad entre VLANs académicas y administrativas.</li>
+                                <li>Pruebas iniciales de rendimiento y seguridad.</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <div class="deliverables">
+                    <h4>Entregables:</h4>
+                    <ul>
+                        <li>Firewall Fortinet instalado físicamente.</li>
+                        <li>Políticas de acceso básicas configuradas.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="phase">
+                <h3>Fase 4: Implementación de Políticas de Seguridad y Segmentación (Semana 6)</h3>
+                <table>
+                    <tr>
+                        <th>SEMANA</th>
+                        <th>ACTIVIDADES</th>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>
+                            <ul>
+                                <li>Segmentación avanzada de VLANs académicas y administrativas mediante el firewall Fortinet.</li>
+                                <li>Configuración de Firewall Fortinet para controlar el tráfico entre las VLANs.</li>
+                                <li>Implementación de políticas avanzadas de seguridad, como filtrado de contenido, protección contra intrusiones (IPS) y VPN para acceso remoto seguro.</li>
+                                <li>Realización de pruebas de seguridad (Escaneo de vulnerabilidades, pruebas de acceso no autorizado).</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <div class="deliverables">
+                    <h4>Entregables:</h4>
+                    <ul>
+                        <li>Segmentación de VLAN con políticas definidas.</li>
+                        <li>Configuración avanzada de seguridad documentada.</li>
+                        <li>Reporte de pruebas de seguridad y ajustes realizados.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="phase">
+                <h3>Fase 5: Validación, Monitoreo y Capacitación (Semana 7)</h3>
+                <table>
+                    <tr>
+                        <th>SEMANA</th>
+                        <th>ACTIVIDADES</th>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>
+                            <ul>
+                                <li>Monitoreo continuo de la red institucional para verificar la efectividad del firewall (monitoreo de tráfico, incidentes bloqueados).</li>
+                                <li>Realización de pruebas de rendimiento (latencia, ancho de banda, seguridad).</li>
+                                <li>Capacitación al personal de TI sobre gestión y mantenimiento del firewall.</li>
+                                <li>Documentación técnica del sistema de firewall y configuración de las políticas de seguridad.</li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+                <div class="deliverables">
+                    <h4>Entregables:</h4>
+                    <ul>
+                        <li>Informe de rendimiento de seguridad.</li>
+                        <li>Manual de operaciones y mantenimiento para el personal de TI.</li>
+                        <li>Reporte final de validación y monitoreo.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>© 2023 Implementación de FortiGate-900G - Todos los derechos reservados</p>
+            <p>Departamento de Tecnologías de la Información - IESREA CHICLAYO</p>
+        </div>
+    </div>
+</body>
+</html>
