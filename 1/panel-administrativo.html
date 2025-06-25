@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Matrículas - Administración</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            background-color: #343a40;
+            color: white;
+            min-height: 100vh;
+        }
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+        }
+        .sidebar a:hover {
+            color: white;
+            background-color: #495057;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .tab-content {
+            padding: 20px 0;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+        }
+        .status-approved {
+            background-color: #d4edda;
+        }
+        .status-rejected {
+            background-color: #f8d7da;
+        }
+        .badge-custom {
+            font-size: 0.85em;
+            padding: 5px 8px;
+        }
+        .search-box {
+            max-width: 300px;
+        }
+        #pdfContainer {
+            position: absolute;
+            left: -9999px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-dark">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <img src="../img/Usuario.jpg" class="rounded-circle" alt="Foto perfil" style="height: 100px;">
+                        <h5 class="mt-2">Admin User</h5>
+                        <p class="text-muted">Administrador</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="#validacion" class="nav-link active" data-bs-toggle="tab">
+                                <i class="bi bi-clipboard-check me-2"></i> Validar Matrículas
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#gestion" class="nav-link" data-bs-toggle="tab">
+                                <i class="bi bi-book me-2"></i> Gestión Académica
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#reportes" class="nav-link" data-bs-toggle="tab">
+                                <i class="bi bi-file-earmark-bar-graph me-2"></i> Reportes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Panel Administrativo</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-sm btn-outline-danger" id="logoutBtn">
+                            <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Validación de Matrículas Tab -->
+                    <div class="tab-pane fade show active" id="validacion">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Validación de Matrículas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="input-group search-box">
+                                            <input type="text" class="form-control" placeholder="Buscar estudiante..." id="searchStudent">
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="bi bi-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="btn-group float-end">
+                                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Filtrar por estado
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#" data-filter="all">Todos</a></li>
+                                                <li><a class="dropdown-item" href="#" data-filter="pending">Pendientes</a></li>
+                                                <li><a class="dropdown-item" href="#" data-filter="approved">Aprobados</a></li>
+                                                <li><a class="dropdown-item" href="#" data-filter="rejected">Rechazados</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Estudiante</th>
+                                                <th>Código</th>
+                                                <th>Programa</th>
+                                                <th>Semestre</th>
+                                                <th>Créditos</th>
+                                                <th>Cursos</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="matriculasTable">
+                                            <!-- Fila 1 -->
+                                            <tr class="status-pending">
+                                                <td>1001</td>
+                                                <td>Juan Pérez</td>
+                                                <td>EST2023001</td>
+                                                <td>Ingeniería</td>
+                                                <td>2023-3</td>
+                                                <td>14</td>
+                                                <td>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Cálculo II">MAT103</span>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Física Avanzada">FIS102</span>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Estructuras de Datos">PRO201</span>
+                                                </td>
+                                                <td><span class="badge bg-warning text-dark">Pendiente</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success btn-approve" data-id="1001">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger btn-reject" data-id="1001">
+                                                        <i class="bi bi-x-circle"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info btn-view" data-id="1001">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <!-- Fila 2 -->
+                                            <tr class="status-approved">
+                                                <td>1002</td>
+                                                <td>María Gómez</td>
+                                                <td>EST2023002</td>
+                                                <td>Medicina</td>
+                                                <td>2023-3</td>
+                                                <td>18</td>
+                                                <td>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Anatomía I">MED101</span>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Biología Celular">MED102</span>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Química Orgánica">MED103</span>
+                                                </td>
+                                                <td><span class="badge bg-success">Aprobado</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-secondary btn-undo" data-id="1002">
+                                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info btn-view" data-id="1002">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <!-- Fila 3 -->
+                                            <tr class="status-rejected">
+                                                <td>1003</td>
+                                                <td>Carlos Ruiz</td>
+                                                <td>EST2023003</td>
+                                                <td>Derecho</td>
+                                                <td>2023-3</td>
+                                                <td>8</td>
+                                                <td>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Derecho Civil I">DER101</span>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Teoría del Estado">DER102</span>
+                                                </td>
+                                                <td><span class="badge bg-danger">Rechazado</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success btn-approve" data-id="1003">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-secondary btn-undo" data-id="1003">
+                                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info btn-view" data-id="1003">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <!-- Fila 4 -->
+                                            <tr class="status-pending">
+                                                <td>1004</td>
+                                                <td>Ana Torres</td>
+                                                <td>EST2023004</td>
+                                                <td>Administración</td>
+                                                <td>2023-3</td>
+                                                <td>16</td>
+                                                <td>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Contabilidad I">ADM101</span>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Microeconomía">ADM102</span>
+                                                    <span class="badge bg-secondary badge-custom" data-bs-toggle="tooltip" title="Matemáticas Financieras">ADM103</span>
+                                                </td>
+                                                <td><span class="badge bg-warning text-dark">Pendiente</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success btn-approve" data-id="1004">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger btn-reject" data-id="1004">
+                                                        <i class="bi bi-x-circle"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info btn-view" data-id="1004">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">Siguiente</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gestión Académica Tab -->
+                    <div class="tab-pane fade" id="gestion">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Gestión de Oferta Académica</h5>
+                                    <button class="btn btn-sm btn-light" id="addCourseBtn">
+                                        <i class="bi bi-plus-circle me-1"></i> Nuevo Curso
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nav nav-tabs" id="academicTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button">Cursos</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="teachers-tab" data-bs-toggle="tab" data-bs-target="#teachers" type="button">Docentes</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="programs-tab" data-bs-toggle="tab" data-bs-target="#programs" type="button">Programas</button>
+                                    </li>
+                                </ul>
+                                
+                                <div class="tab-content pt-3" id="academicTabContent">
+                                    <!-- Cursos Tab -->
+                                    <div class="tab-pane fade show active" id="courses">
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Buscar cursos...">
+                                                    <button class="btn btn-outline-secondary" type="button">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select class="form-select">
+                                                    <option selected>Filtrar por programa</option>
+                                                    <option>Ingeniería</option>
+                                                    <option>Medicina</option>
+                                                    <option>Derecho</option>
+                                                    <option>Administración</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <select class="form-select">
+                                                    <option selected>Filtrar por semestre</option>
+                                                    <option>2023-1</option>
+                                                    <option>2023-2</option>
+                                                    <option>2023-3</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Código</th>
+                                                        <th>Nombre</th>
+                                                        <th>Programa</th>
+                                                        <th>Semestre</th>
+                                                        <th>Créditos</th>
+                                                        <th>Docente</th>
+                                                        <th>Cupos</th>
+                                                        <th>Estado</th>
+                                                        <th>Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>MAT103</td>
+                                                        <td>Cálculo II</td>
+                                                        <td>Ingeniería</td>
+                                                        <td>3</td>
+                                                        <td>4</td>
+                                                        <td>Dr. Rodríguez</td>
+                                                        <td>
+                                                            <span class="text-success">25/30</span>
+                                                        </td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>FIS102</td>
+                                                        <td>Física Avanzada</td>
+                                                        <td>Ingeniería</td>
+                                                        <td>3</td>
+                                                        <td>4</td>
+                                                        <td>Dra. Martínez</td>
+                                                        <td>
+                                                            <span class="text-success">18/25</span>
+                                                        </td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>MED101</td>
+                                                        <td>Anatomía I</td>
+                                                        <td>Medicina</td>
+                                                        <td>1</td>
+                                                        <td>5</td>
+                                                        <td>Dr. Vargas</td>
+                                                        <td>
+                                                            <span class="text-danger">30/30</span>
+                                                        </td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ADM103</td>
+                                                        <td>Matemáticas Financieras</td>
+                                                        <td>Administración</td>
+                                                        <td>3</td>
+                                                        <td>3</td>
+                                                        <td>Mg. López</td>
+                                                        <td>
+                                                            <span class="text-warning">15/20</span>
+                                                        </td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>DER102</td>
+                                                        <td>Teoría del Estado</td>
+                                                        <td>Derecho</td>
+                                                        <td>2</td>
+                                                        <td>3</td>
+                                                        <td>Dr. Fernández</td>
+                                                        <td>
+                                                            <span class="text-success">10/25</span>
+                                                        </td>
+                                                        <td><span class="badge bg-secondary">Inactivo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Docentes Tab -->
+                                    <div class="tab-pane fade" id="teachers">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Buscar docentes...">
+                                                    <button class="btn btn-outline-secondary" type="button">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <button class="btn btn-primary">
+                                                    <i class="bi bi-plus-circle me-1"></i> Nuevo Docente
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Código</th>
+                                                        <th>Nombre</th>
+                                                        <th>Especialidad</th>
+                                                        <th>Título</th>
+                                                        <th>Correo</th>
+                                                        <th>Estado</th>
+                                                        <th>Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>DOC101</td>
+                                                        <td>Dr. Carlos Rodríguez</td>
+                                                        <td>Matemáticas</td>
+                                                        <td>Ph.D. en Matemáticas</td>
+                                                        <td>crodriguez@universidad.edu</td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>DOC102</td>
+                                                        <td>Dra. Ana Martínez</td>
+                                                        <td>Física</td>
+                                                        <td>Ph.D. en Física</td>
+                                                        <td>amartinez@universidad.edu</td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>DOC103</td>
+                                                        <td>Dr. Luis Vargas</td>
+                                                        <td>Medicina</td>
+                                                        <td>M.D. en Cirugía</td>
+                                                        <td>lvargas@universidad.edu</td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>DOC104</td>
+                                                        <td>Mg. Sofía López</td>
+                                                        <td>Finanzas</td>
+                                                        <td>M.Sc. en Finanzas</td>
+                                                        <td>slopez@universidad.edu</td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Programas Tab -->
+                                    <div class="tab-pane fade" id="programs">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Buscar programas...">
+                                                    <button class="btn btn-outline-secondary" type="button">
+                                                        <i class="bi bi-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <button class="btn btn-primary">
+                                                    <i class="bi bi-plus-circle me-1"></i> Nuevo Programa
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Código</th>
+                                                        <th>Nombre</th>
+                                                        <th>Facultad</th>
+                                                        <th>Créditos Totales</th>
+                                                        <th>Duración</th>
+                                                        <th>Estado</th>
+                                                        <th>Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>ING</td>
+                                                        <td>Ingeniería de Sistemas</td>
+                                                        <td>Ingeniería</td>
+                                                        <td>160</td>
+                                                        <td>10 semestres</td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>MED</td>
+                                                        <td>Medicina</td>
+                                                        <td>Ciencias de la Salud</td>
+                                                        <td>240</td>
+                                                        <td>12 semestres</td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>DER</td>
+                                                        <td>Derecho</td>
+                                                        <td>Ciencias Jurídicas</td>
+                                                        <td>180</td>
+                                                        <td>10 semestres</td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ADM</td>
+                                                        <td>Administración de Empresas</td>
+                                                        <td>Ciencias Económicas</td>
+                                                        <td>150</td>
+                                                        <td>8 semestres</td>
+                                                        <td><span class="badge bg-success">Activo</span></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-primary">
+                                                                <i class="bi bi-pencil"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-danger">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reportes Tab -->
+                    <div class="tab-pane fade" id="reportes">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Reportes Administrativos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Reporte por Programa</h5>
+                                                <p class="card-text">Genera reportes detallados de matrículas por programa académico.</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Seleccionar Programa</label>
+                                                    <select class="form-select">
+                                                        <option selected>Todos los programas</option>
+                                                        <option>Ingeniería</option>
+                                                        <option>Medicina</option>
+                                                        <option>Derecho</option>
+                                                        <option>Administración</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Semestre</label>
+                                                    <select class="form-select">
+                                                        <option selected>2023-3</option>
+                                                        <option>2023-2</option>
+                                                        <option>2023-1</option>
+                                                    </select>
+                                                </div>
+                                                <button class="btn btn-primary w-100" id="generateProgramReport">
+                                                    <i class="bi bi-file-earmark-pdf me-1"></i> Generar Reporte
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Reporte por Curso</h5>
+                                                <p class="card-text">Genera reportes de estudiantes matriculados por curso.</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Seleccionar Curso</label>
+                                                    <select class="form-select">
+                                                        <option selected>Todos los cursos</option>
+                                                        <option>MAT103 - Cálculo II</option>
+                                                        <option>FIS102 - Física Avanzada</option>
+                                                        <option>PRO201 - Estructuras de Datos</option>
+                                                        <option>MED101 - Anatomía I</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Semestre</label>
+                                                    <select class="form-select">
+                                                        <option selected>2023-3</option>
+                                                        <option>2023-2</option>
+                                                        <option>2023-1</option>
+                                                    </select>
+                                                </div>
+                                                <button class="btn btn-primary w-100" id="generateCourseReport">
+                                                    <i class="bi bi-file-earmark-pdf me-1"></i> Generar Reporte
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Reporte de Matrículas</h5>
+                                                <p class="card-text">Genera reportes generales de estado de matrículas.</p>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Tipo de Reporte</label>
+                                                    <select class="form-select" id="reportType">
+                                                        <option selected>Resumen general</option>
+                                                        <option>Matrículas aprobadas</option>
+                                                        <option>Matrículas rechazadas</option>
+                                                        <option>Matrículas pendientes</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Semestre</label>
+                                                    <select class="form-select">
+                                                        <option selected>2023-3</option>
+                                                        <option>2023-2</option>
+                                                        <option>2023-1</option>
+                                                    </select>
+                                                </div>
+                                                <button class="btn btn-primary w-100" id="generateEnrollmentReport">
+                                                    <i class="bi bi-file-earmark-pdf me-1"></i> Generar Reporte
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Estadísticas de Matrícula</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>Matrículas por Programa</h6>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Programa</th>
+                                                                <th>Matriculados</th>
+                                                                <th>% Total</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Ingeniería</td>
+                                                                <td>120</td>
+                                                                <td>
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar" role="progressbar" style="width: 40%"></div>
+                                                                    </div>
+                                                                    <span>40%</span>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Medicina</td>
+                                                                <td>80</td>
+                                                                <td>
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar" role="progressbar" style="width: 27%"></div>
+                                                                    </div>
+                                                                    <span>27%</span>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Derecho</td>
+                                                                <td>60</td>
+                                                                <td>
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar" role="progressbar" style="width: 20%"></div>
+                                                                    </div>
+                                                                    <span>20%</span>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Administración</td>
+                                                                <td>40</td>
+                                                                <td>
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar" role="progressbar" style="width: 13%"></div>
+                                                                    </div>
+                                                                    <span>13%</span>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Estado de Matrículas</h6>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Estado</th>
+                                                                <th>Cantidad</th>
+                                                                <th>% Total</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>Aprobadas</td>
+                                                                <td>210</td>
+                                                                <td>
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar bg-success" role="progressbar" style="width: 70%"></div>
+                                                                    </div>
+                                                                    <span>70%</span>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Pendientes</td>
+                                                                <td>60</td>
+                                                                <td>
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 20%"></div>
+                                                                    </div>
+                                                                    <span>20%</span>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>Rechazadas</td>
+                                                                <td>30</td>
+                                                                <td>
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 10%"></div>
+                                                                    </div>
+                                                                    <span>10%</span>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles de matrícula -->
+    <div class="modal fade" id="viewEnrollmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalles de Matrícula</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Datos del Estudiante</h6>
+                            <p><strong>Nombre:</strong> Juan Pérez</p>
+                            <p><strong>Código:</strong> EST2023001</p>
+                            <p><strong>Programa:</strong> Ingeniería de Sistemas</p>
+                            <p><strong>Semestre:</strong> 2023-3</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Información de Matrícula</h6>
+                            <p><strong>Fecha:</strong> 15/08/2023</p>
+                            <p><strong>Estado:</strong> <span class="badge bg-warning text-dark">Pendiente</span></p>
+                            <p><strong>Créditos:</strong> 14</p>
+                            <p><strong>Promedio:</strong> 15.4</p>
+                        </div>
+                    </div>
+                    
+                    <h6>Cursos Matriculados</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Curso</th>
+                                    <th>Créditos</th>
+                                    <th>Horario</th>
+                                    <th>Docente</th>
+                                    <th>Cupo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>MAT103</td>
+                                    <td>Cálculo II</td>
+                                    <td>4</td>
+                                    <td>Lun/Mié 8:00-10:00</td>
+                                    <td>Dr. Rodríguez</td>
+                                    <td>25/30</td>
+                                </tr>
+                                <tr>
+                                    <td>FIS102</td>
+                                    <td>Física Avanzada</td>
+                                    <td>4</td>
+                                    <td>Mar/Jue 10:00-12:00</td>
+                                    <td>Dra. Martínez</td>
+                                    <td>18/25</td>
+                                </tr>
+                                <tr>
+                                    <td>PRO201</td>
+                                    <td>Estructuras de Datos</td>
+                                    <td>3</td>
+                                    <td>Mié/Vie 14:00-16:00</td>
+                                    <td>Mg. Gómez</td>
+                                    <td>15/20</td>
+                                </tr>
+                                <tr>
+                                    <td>ING101</td>
+                                    <td>Inglés Técnico</td>
+                                    <td>3</td>
+                                    <td>Lun/Mié 16:00-18:00</td>
+                                    <td>Lic. Smith</td>
+                                    <td>10/15</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h6>Prerrequisitos Cumplidos</h6>
+                        <ul>
+                            <li>MAT102 - Cálculo I (Aprobado con 13)</li>
+                            <li>FIS101 - Física General (Aprobado con 14)</li>
+                            <li>PRO102 - Programación II (Aprobado con 17)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success">
+                        <i class="bi bi-check-circle me-1"></i> Aprobar Matrícula
+                    </button>
+                    <button type="button" class="btn btn-danger">
+                        <i class="bi bi-x-circle me-1"></i> Rechazar Matrícula
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para agregar nuevo curso -->
+    <div class="modal fade" id="addCourseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar Nuevo Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="courseForm">
+                        <div class="mb-3">
+                            <label for="courseCode" class="form-label">Código del Curso</label>
+                            <input type="text" class="form-control" id="courseCode" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="courseName" class="form-label">Nombre del Curso</label>
+                            <input type="text" class="form-control" id="courseName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="courseProgram" class="form-label">Programa</label>
+                            <select class="form-select" id="courseProgram" required>
+                                <option value="" selected disabled>Seleccionar programa</option>
+                                <option>Ingeniería</option>
+                                <option>Medicina</option>
+                                <option>Derecho</option>
+                                <option>Administración</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="courseSemester" class="form-label">Semestre</label>
+                                <input type="number" class="form-control" id="courseSemester" min="1" max="10" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="courseCredits" class="form-label">Créditos</label>
+                                <input type="number" class="form-control" id="courseCredits" min="1" max="6" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="courseTeacher" class="form-label">Docente</label>
+                            <select class="form-select" id="courseTeacher" required>
+                                <option value="" selected disabled>Seleccionar docente</option>
+                                <option>Dr. Carlos Rodríguez</option>
+                                <option>Dra. Ana Martínez</option>
+                                <option>Dr. Luis Vargas</option>
+                                <option>Mg. Sofía López</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="courseCapacity" class="form-label">Cupo Máximo</label>
+                                <input type="number" class="form-control" id="courseCapacity" min="10" max="50" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="courseSchedule" class="form-label">Horario</label>
+                                <input type="text" class="form-control" id="courseSchedule" placeholder="Ej: Lun/Mié 8:00-10:00" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="coursePrerequisites" class="form-label">Prerrequisitos</label>
+                            <select class="form-select" id="coursePrerequisites" multiple>
+                                <option>MAT101 - Matemáticas Básicas</option>
+                                <option>MAT102 - Cálculo I</option>
+                                <option>FIS101 - Física General</option>
+                                <option>PRO101 - Programación I</option>
+                                <option>PRO102 - Programación II</option>
+                            </select>
+                            <div class="form-text">Mantén presionada la tecla Ctrl (Windows) o Command (Mac) para seleccionar múltiples opciones.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveCourseBtn">Guardar Curso</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor oculto para generar PDF -->
+    <div id="pdfContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // Inicializar jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Filtrar matrículas por estado
+            document.querySelectorAll('[data-filter]').forEach(filter => {
+                filter.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const filterValue = this.getAttribute('data-filter');
+                    const rows = document.querySelectorAll('#matriculasTable tr');
+                    
+                    rows.forEach(row => {
+                        if (filterValue === 'all') {
+                            row.style.display = '';
+                        } else {
+                            if (row.classList.contains(`status-${filterValue}`)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+            
+            // Acciones de matrículas
+            document.querySelectorAll('.btn-approve').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const enrollmentId = this.getAttribute('data-id');
+                    Swal.fire({
+                        title: '¿Aprobar matrícula?',
+                        text: '¿Estás seguro de aprobar esta matrícula?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, aprobar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Aquí iría la lógica para aprobar la matrícula
+                            const row = this.closest('tr');
+                            row.classList.remove('status-pending', 'status-rejected');
+                            row.classList.add('status-approved');
+                            row.querySelector('td:nth-child(8)').innerHTML = '<span class="badge bg-success">Aprobado</span>';
+                            
+                            Swal.fire(
+                                '¡Aprobado!',
+                                'La matrícula ha sido aprobada.',
+                                'success'
+                            );
+                        }
+                    });
+                });
+            });
+            
+            document.querySelectorAll('.btn-reject').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const enrollmentId = this.getAttribute('data-id');
+                    Swal.fire({
+                        title: '¿Rechazar matrícula?',
+                        text: '¿Estás seguro de rechazar esta matrícula?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, rechazar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Aquí iría la lógica para rechazar la matrícula
+                            const row = this.closest('tr');
+                            row.classList.remove('status-pending', 'status-approved');
+                            row.classList.add('status-rejected');
+                            row.querySelector('td:nth-child(8)').innerHTML = '<span class="badge bg-danger">Rechazado</span>';
+                            
+                            Swal.fire(
+                                '¡Rechazado!',
+                                'La matrícula ha sido rechazada.',
+                                'success'
+                            );
+                        }
+                    });
+                });
+            });
+            
+            document.querySelectorAll('.btn-undo').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const enrollmentId = this.getAttribute('data-id');
+                    Swal.fire({
+                        title: '¿Revertir acción?',
+                        text: '¿Estás seguro de marcar esta matrícula como pendiente nuevamente?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ffc107',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, revertir',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Aquí iría la lógica para revertir la matrícula
+                            const row = this.closest('tr');
+                            row.classList.remove('status-approved', 'status-rejected');
+                            row.classList.add('status-pending');
+                            row.querySelector('td:nth-child(8)').innerHTML = '<span class="badge bg-warning text-dark">Pendiente</span>';
+                            
+                            Swal.fire(
+                                '¡Revertido!',
+                                'La matrícula ha sido marcada como pendiente.',
+                                'success'
+                            );
+                        }
+                    });
+                });
+            });
+            
+            document.querySelectorAll('.btn-view').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const enrollmentId = this.getAttribute('data-id');
+                    const modal = new bootstrap.Modal(document.getElementById('viewEnrollmentModal'));
+                    modal.show();
+                });
+            });
+            
+            // Agregar nuevo curso
+            document.getElementById('addCourseBtn').addEventListener('click', function() {
+                const modal = new bootstrap.Modal(document.getElementById('addCourseModal'));
+                modal.show();
+            });
+            
+            document.getElementById('saveCourseBtn').addEventListener('click', function() {
+                // Validar formulario
+                const form = document.getElementById('courseForm');
+                if (!form.checkValidity()) {
+                    form.classList.add('was-validated');
+                    return;
+                }
+                
+                // Aquí iría la lógica para guardar el nuevo curso
+                Swal.fire(
+                    '¡Curso guardado!',
+                    'El nuevo curso ha sido agregado al sistema.',
+                    'success'
+                );
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addCourseModal'));
+                modal.hide();
+            });
+            
+            // Generar reportes
+            document.getElementById('generateProgramReport').addEventListener('click', function() {
+                generateReport('programa');
+            });
+            
+            document.getElementById('generateCourseReport').addEventListener('click', function() {
+                generateReport('curso');
+            });
+            
+            document.getElementById('generateEnrollmentReport').addEventListener('click', function() {
+                const reportType = document.getElementById('reportType').value;
+                generateReport('matrícula', reportType);
+            });
+            
+            function generateReport(type, subtype = '') {
+                const pdfContainer = document.getElementById('pdfContainer');
+                const today = new Date();
+                const dateStr = today.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                let title = '';
+                let content = '';
+                
+                if (type === 'programa') {
+                    title = 'Reporte por Programa Académico';
+                    content = `
+                        <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px;">
+                            ${title}
+                        </h3>
+                        <p><strong>Fecha:</strong> ${dateStr}</p>
+                        <p><strong>Semestre:</strong> 2023-3</p>
+                        
+                        <h4 style="margin-top: 20px; color: #2c3e50;">Resumen por Programa</h4>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                            <thead>
+                                <tr style="background-color: #3498db; color: white;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Programa</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Matriculados</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">% Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Ingeniería</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">120</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">40%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Medicina</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">80</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">27%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Derecho</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">60</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">20%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Administración</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">40</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">13%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                } else if (type === 'curso') {
+                    title = 'Reporte por Curso';
+                    content = `
+                        <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px;">
+                            ${title}
+                        </h3>
+                        <p><strong>Fecha:</strong> ${dateStr}</p>
+                        <p><strong>Semestre:</strong> 2023-3</p>
+                        <p><strong>Curso:</strong> MAT103 - Cálculo II</p>
+                        
+                        <h4 style="margin-top: 20px; color: #2c3e50;">Estudiantes Matriculados</h4>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                            <thead>
+                                <tr style="background-color: #3498db; color: white;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Código</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Estudiante</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Programa</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">EST2023001</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Juan Pérez</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Ingeniería</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Aprobado</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">EST2023005</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Laura Méndez</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Ingeniería</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Aprobado</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">EST2023008</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Carlos Sánchez</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Ingeniería</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">Pendiente</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p><strong>Total estudiantes:</strong> 25 (de 30 cupos disponibles)</p>
+                    `;
+                } else if (type === 'matrícula') {
+                    title = 'Reporte de Matrículas';
+                    if (subtype === 'Resumen general') {
+                        content = `
+                            <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px;">
+                                ${title} - Resumen General
+                            </h3>
+                            <p><strong>Fecha:</strong> ${dateStr}</p>
+                            <p><strong>Semestre:</strong> 2023-3</p>
+                            
+                            <h4 style="margin-top: 20px; color: #2c3e50;">Estadísticas Generales</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                                <thead>
+                                    <tr style="background-color: #3498db; color: white;">
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Estado</th>
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Cantidad</th>
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">% Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Aprobadas</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">210</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">70%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Pendientes</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">60</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">20%</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Rechazadas</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">30</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">10%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        const status = subtype.replace('Matrículas ', '');
+                        title += ` - ${status}`;
+                        content = `
+                            <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px;">
+                                ${title}
+                            </h3>
+                            <p><strong>Fecha:</strong> ${dateStr}</p>
+                            <p><strong>Semestre:</strong> 2023-3</p>
+                            
+                            <h4 style="margin-top: 20px; color: #2c3e50;">Listado de Matrículas ${status}</h4>
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                                <thead>
+                                    <tr style="background-color: #3498db; color: white;">
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Código</th>
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Estudiante</th>
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Programa</th>
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Créditos</th>
+                                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">EST2023001</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Juan Pérez</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Ingeniería</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">14</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">15/08/2023</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">EST2023002</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">María Gómez</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Medicina</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">18</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">14/08/2023</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">EST2023003</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Carlos Ruiz</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">Derecho</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">8</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">16/08/2023</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `;
+                    }
+                }
+                
+                pdfContainer.innerHTML = `
+                    <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h1 style="color: #2c3e50;">I.E.S Federal Alemana</h1>
+                            <h2 style="color: #3498db;">${title}</h2>
+                        </div>
+                        
+                        ${content}
+                        
+                        <div style="margin-top: 50px; text-align: center; color: #7f8c8d; font-size: 0.9em;">
+                            <p>Este documento es generado automáticamente por el sistema de matrículas.</p>
+                            <p>I.E.S Federal Alemana - Todos los derechos reservados © ${today.getFullYear()}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Generar PDF
+                html2canvas(pdfContainer).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210; // A4 width in mm
+                    const pageHeight = 295; // A4 height in mm
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    // Descargar PDF
+                    pdf.save(`${title.replace(/ /g, '_')}_${dateStr.replace(/\//g, '-')}.pdf`);
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Reporte generado',
+                        text: 'El reporte se ha descargado correctamente.',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                });
+            }
+            
+            // Cerrar sesión
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                Swal.fire({
+                    title: '¿Estás seguro de cerrar sesión?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, cerrar sesión',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Simular cierre de sesión
+                        Swal.fire({
+                            title: 'Sesión cerrada',
+                            text: 'Has cerrado sesión correctamente.',
+                            icon: 'success',
+                            confirmButtonColor: '#0d6efd'
+                        }).then(() => {
+                            // Redirigir a la página de login (simulado)
+                            window.location.href = 'proyecto1.html';
+                        });
+                    }
+                });
+            });
+            
+            // Navegación entre tabs
+            const tabLinks = document.querySelectorAll('.sidebar a[data-bs-toggle="tab"]');
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    tabLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
