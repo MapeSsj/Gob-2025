@@ -158,14 +158,6 @@ body {
     color: #aaa;
 }
 
-.logo-img {
-    position: fixed;
-    top: 15px;
-    left: 20px;
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-}
 
 @media (max-width: 768px) {
     .header {
