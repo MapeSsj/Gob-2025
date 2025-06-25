@@ -38,7 +38,7 @@ function showProjectDetails(projectId) {
                                     <h4>Detalles del Proyecto</h4>
                                     <p style="text-align: justify;">${projectDescriptions[projectId]}</p>
                                     <ul class="list-group list-group-flush">
-                                        <li class="list-group-item"><strong>Presupuesto:</strong> $${(150 + projectId * 50).toLocaleString()} mil</li>
+                                        <li class="list-group-item"><strong>Presupuesto:</strong> $${(150 + projectId * 80).toLocaleString()}</li>
                                         <li class="list-group-item"><strong>Duración:</strong> ${9 + projectId} Semanas</li>
                                         <li class="list-group-item"><strong>Estado:</strong> <span class="badge bg-success">En ejecución</span></li>
                                     </ul>

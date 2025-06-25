@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Cursos - Plataforma de Formación Docente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #dc2626;
+            --light-color: #f8fafc;
+            --dark-color: #1e293b;
+            --success-color: #16a34a;
+            --warning-color: #d97706;
+            --gray-light: #e2e8f0;
+            --gray-medium: #94a3b8;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f1f5f9;
+            color: var(--dark-color);
+            line-height: 1.5;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid var(--gray-light);
+            margin-bottom: 24px;
+        }
+        
+        .logo {
+            width: 100px;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .user-info h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .user-info p {
+            font-size: 13px;
+            color: var(--gray-medium);
+        }
+        
+        .nav-menu {
+            padding: 0 16px;
+        }
+        
+        .nav-item {
+            margin-bottom: 4px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--dark-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background-color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .back-button {
+            color: var(--primary-color);
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .back-button:hover {
+            transform: translateX(-3px);
+        }
+        
+        .page-title h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .page-title p {
+            color: var(--gray-medium);
+            font-size: 14px;
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .notification-btn, .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .notification-btn:hover, .logout-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--accent-color);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Pestañas de Mis Cursos */
+        .course-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-light);
+            margin-bottom: 24px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        /* Filtros de búsqueda */
+        .search-filters {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .filter-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: var(--light-color);
+        }
+        
+        .search-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            align-self: flex-end;
+            transition: all 0.2s;
+        }
+        
+        .search-btn:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        /* Contenedor de cursos */
+        .courses-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .course-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .course-image {
+            height: 160px;
+            background-color: var(--gray-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .course-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .course-category {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .course-content {
+            padding: 16px;
+        }
+        
+        .course-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .course-description {
+            font-size: 14px;
+            color: var(--gray-medium);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--gray-medium);
+            margin-bottom: 16px;
+        }
+        
+        .course-instructor {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+        
+        .instructor-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .course-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .course-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-outline {
+            border: 1px solid var(--gray-light);
+            color: var(--dark-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--gray-light);
+        }
+        
+        /* Sección de cursos en progreso */
+        .progress-section {
+            margin-bottom: 32px;
+        }
+        
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .section-title h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .search-filters {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .courses-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="recursos/logoInstituto.png" alt="Logo" class="logo">
+            <div class="user-profile">
+                <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Usuario" class="user-avatar">
+                <div class="user-info">
+                    <h3>María González</h3>
+                    <p>Docente de Matemáticas</p>
+                </div>
+            </div>
+            <!-- Botón de retroceso -->
+            <a href="proyecto5.html" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+ 
+        </div>
+        
+        <nav class="nav-menu">
+            <div class="nav-item">
+                <a href="user.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-book-open"></i>
+                    <span>Mis Cursos</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-certificate"></i>
+                    <span>Certificados</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Progreso</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-comments"></i>
+                    <span>Foros</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="page-title">
+                <h1>Mis Cursos</h1>
+                <p>Gestiona tu formación continua</p>
+            </div>
+            <div class="user-actions">
+                <div class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Pestañas -->
+        <div class="course-tabs">
+            <div class="tab active">En progreso</div>
+            <div class="tab">Completados</div>
+            <div class="tab">Catálogo</div>
+        </div>
+        
+        <!-- Filtros de búsqueda (visible en pestaña Catálogo) -->
+        <div class="search-filters">
+            <div class="filter-group">
+                <label for="search">Buscar cursos</label>
+                <input type="text" id="search" class="filter-control" placeholder="Escribe palabras clave...">
+            </div>
+            <div class="filter-group">
+                <label for="category">Categoría</label>
+                <select id="category" class="filter-control">
+                    <option value="">Todas las categorías</option>
+                    <option value="matematicas">Matemáticas</option>
+                    <option value="ciencias">Ciencias</option>
+                    <option value="lenguaje">Lenguaje</option>
+                    <option value="tecnologia">Tecnología Educativa</option>
+                    <option value="pedagogia">Pedagogía</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="level">Nivel</label>
+                <select id="level" class="filter-control">
+                    <option value="">Todos los niveles</option>
+                    <option value="basico">Básico</option>
+                    <option value="intermedio">Intermedio</option>
+                    <option value="avanzado">Avanzado</option>
+                </select>
+            </div>
+            <button class="search-btn">Buscar</button>
+        </div>
+        
+        <!-- Sección de cursos en progreso -->
+        <div class="progress-section">
+            <div class="section-title">
+                <h2>Tus cursos en progreso</h2>
+                <a href="#" style="font-size: 14px; color: var(--primary-color);">Ver todos</a>
+            </div>
+            <div class="courses-container">
+                <!-- Curso 1 -->
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="recursos/MatematicaAvanzada.jpg" alt="Matemáticas Avanzadas">
+                        <span class="course-badge">65% completado</span>
+                        <span class="course-category">Matemáticas</span>
+                    </div>
+                    <div class="course-content">
+                        <h3 class="course-title">Didáctica de las Matemáticas en Educación Secundaria</h3>
+                        <p class="course-description">Aprende estrategias innovadoras para enseñar matemáticas de manera efectiva a estudiantes de secundaria.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-play-circle"></i> 12/18 lecciones</span>
+                            <span><i class="fas fa-clock"></i> 8 semanas</span>
+                        </div>
+                        <div class="course-instructor">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Instructor" class="instructor-avatar">
+                            <span>Dr. Carlos Mendoza</span>
+                        </div>
+                        <div class="course-actions">
+                            <a href="#" class="course-btn btn-primary">Continuar</a>
+                            <a href="#" class="course-btn btn-outline">Detalles</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Curso 2 -->
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="recursos/tecnologia-educativa.jpg" alt="Tecnología Educativa">
+                        <span class="course-badge">30% completado</span>
+                        <span class="course-category">Tecnología</span>
+                    </div>
+                    <div class="course-content">
+                        <h3 class="course-title">Integración de Tecnología en el Aula</h3>
+                        <p class="course-description">Descubre herramientas digitales y metodologías para enriquecer tus clases y mejorar el aprendizaje.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-play-circle"></i> 5/16 lecciones</span>
+                            <span><i class="fas fa-clock"></i> 6 semanas</span>
+                        </div>
+                        <div class="course-instructor">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Instructor" class="instructor-avatar">
+                            <span>Dra. Laura Fernández</span>
+                        </div>
+                        <div class="course-actions">
+                            <a href="#" class="course-btn btn-primary">Continuar</a>
+                            <a href="#" class="course-btn btn-outline">Detalles</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Catálogo de cursos -->
+        <div class="section-title">
+            <h2>Explora nuevos cursos</h2>
+            <a href="#" style="font-size: 14px; color: var(--primary-color);">Ver todos</a>
+        </div>
+        
+        <div class="courses-container">
+            <!-- Curso 1 -->
+            <div class="course-card">
+                <div class="course-image">
+                    <img src="recursos/Ciencias.jpg" alt="Ciencias">
+                    <span class="course-category">Ciencias</span>
+                </div>
+                <div class="course-content">
+                    <h3 class="course-title">Enseñanza de las Ciencias Basada en Indagación</h3>
+                    <p class="course-description">Metodología para fomentar el pensamiento científico en tus estudiantes a través de la indagación.</p>
+                    <div class="course-meta">
+                        <span><i class="fas fa-clock"></i> 8 semanas</span>
+                        <span><i class="fas fa-user-graduate"></i> Intermedio</span>
+                    </div>
+                    <div class="course-instructor">
+                        <img src="https://randomuser.me/api/portraits/women/52.jpg" alt="Instructor" class="instructor-avatar">
+                        <span>Dra. Ana Torres</span>
+                    </div>
+                    <div class="course-actions">
+                        <a href="#" class="course-btn btn-primary">Inscribirse</a>
+                        <a href="#" class="course-btn btn-outline">Ver más</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Curso 2 -->
+            <div class="course-card">
+                <div class="course-image">
+                    <img src="recursos/liderazgo.png" alt="Liderazgo">
+                    <span class="course-category">Liderazgo</span>
+                </div>
+                <div class="course-content">
+                    <h3 class="course-title">Liderazgo Educativo para la Innovación</h3>
+                    <p class="course-description">Desarrolla habilidades de liderazgo para impulsar cambios innovadores en tu institución educativa.</p>
+                    <div class="course-meta">
+                        <span><i class="fas fa-clock"></i> 6 semanas</span>
+                        <span><i class="fas fa-user-graduate"></i> Avanzado</span>
+                    </div>
+                    <div class="course-instructor">
+                        <img src="https://randomuser.me/api/portraits/men/60.jpg" alt="Instructor" class="instructor-avatar">
+                        <span>Dr. Roberto Sánchez</span>
+                    </div>
+                    <div class="course-actions">
+                        <a href="#" class="course-btn btn-primary">Inscribirse</a>
+                        <a href="#" class="course-btn btn-outline">Ver más</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Curso 3 -->
+            <div class="course-card">
+                <div class="course-image">
+                    <img src="recursos/Lenguaje.jpg" alt="Lenguaje">
+                    <span class="course-category">Lenguaje</span>
+                </div>
+                <div class="course-content">
+                    <h3 class="course-title">Estrategias para la Enseñanza de la Lectura</h3>
+                    <p class="course-description">Técnicas para desarrollar habilidades de lectura crítica y comprensión lectora en tus estudiantes.</p>
+                    <div class="course-meta">
+                        <span><i class="fas fa-clock"></i> 4 semanas</span>
+                        <span><i class="fas fa-user-graduate"></i> Principiante</span>
+                    </div>
+                    <div class="course-instructor">
+                        <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Instructor" class="instructor-avatar">
+                        <span>Dra. Sofía Castro</span>
+                    </div>
+                    <div class="course-actions">
+                        <a href="#" class="course-btn btn-primary">Inscribirse</a>
+                        <a href="#" class="course-btn btn-outline">Ver más</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simular notificaciones
+        document.querySelector('.notification-btn').addEventListener('click', function() {
+            alert('Tienes 3 notificaciones nuevas:\n\n1. Nuevo mensaje en el foro\n2. Recordatorio: Evaluación pendiente\n3. Nuevo curso disponible');
+        });
+        
+        // Simular logout
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            if(confirm('¿Estás seguro que deseas cerrar sesión?')) {
+                window.location.href = 'login.html';
+            }
+        });
+        
+        // Simular búsqueda
+        document.querySelector('.search-btn').addEventListener('click', function() {
+            const searchTerm = document.getElementById('search').value;
+            const category = document.getElementById('category').value;
+            const level = document.getElementById('level').value;
+            
+            // Aquí iría la lógica real de filtrado
+            alert(`Buscando cursos con:\n\nTérmino: ${searchTerm || 'Ninguno'}\nCategoría: ${category || 'Todas'}\nNivel: ${level || 'Todos'}`);
+        });
+        
+        // Simular cambio de pestañas
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Aquí iría la lógica para mostrar el contenido de cada pestaña
+                alert(`Mostrando contenido de: ${this.textContent}`);
+            });
+        });
+        
+        // Hacer sidebar responsive
+        function handleSidebar() {
+            if(window.innerWidth < 992) {
+                document.querySelector('.sidebar').classList.remove('active');
+                document.querySelector('.main-content').addEventListener('click', function() {
+                    document.querySelector('.sidebar').classList.remove('active');
+                });
+            } else {
+                document.querySelector('.sidebar').classList.add('active');
+            }
+        }
+        
+        window.addEventListener('resize', handleSidebar);
+        handleSidebar();
+    </script>
+</body>
+</html>
