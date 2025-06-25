@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Convenios - Sistema de Prácticas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --sidebar-width: 250px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Barra lateral */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding: 20px 0;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+        
+        .sidebar-header img {
+            height: 50px;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-header h3 {
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .menu-category {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 10px 20px;
+            margin-top: 10px;
+        }
+        
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: white;
+            border-left: 3px solid var(--secondary-color);
+        }
+        
+        /* Botón de regresar */
+        .back-button {
+            display: block;
+            padding: 12px 20px;
+            margin: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .back-button i {
+            margin-right: 8px;
+        }
+        
+        /* Contenido principal */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .header h2 {
+            color: var(--primary-color);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-menu img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        /* Filtros y búsqueda */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        .filter-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        /* Sección de tablas */
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section-header h3 {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn i {
+            margin-right: 5px;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        table th {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+        
+        table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+        }
+        
+        .badge-warning {
+            background-color: rgba(241, 196, 15, 0.2);
+            color: var(--warning-color);
+        }
+        
+        .badge-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent-color);
+        }
+        
+        .badge-info {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary-color);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+        
+        /* Documentos adjuntos */
+        .document-list {
+            margin-top: 20px;
+        }
+        
+        .document-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .document-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .document-icon {
+            margin-right: 10px;
+            color: #7f8c8d;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .filters {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                overflow: hidden;
+            }
+            
+            .sidebar-header h3, .menu-category, .menu-item span, .back-button span {
+                display: none;
+            }
+            
+            .menu-item, .back-button {
+                justify-content: center;
+            }
+            
+            .menu-item i, .back-button i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra lateral -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="/4/recursos/logoInstituto.png" alt="Logo Institucional">
+            <h3>Panel de Administración</h3>
+        </div>
+        
+        <!-- Botón de regresar -->
+        <a href="proyecto4.html" class="back-button">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Cerrar Sesión</span>
+        </a>
+        
+        <div class="sidebar-menu">
+            <div class="menu-category">Principal</div>
+            <a href="panel-admin.html" class="menu-item">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            
+            <div class="menu-category">Gestión</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span>Usuarios</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-building"></i>
+                <span>Empresas</span>
+            </a>
+            <a href="gestion-convenios.html" class="menu-item active">
+                <i class="fas fa-file-contract"></i>
+                <span>Convenios</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            
+            <div class="menu-category">Reportes</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Estadísticas</span>
+            </a>
+            <a href="reportes.html" class="menu-item">
+                <i class="fas fa-file-pdf"></i>
+                <span>Reportes</span>
+            </a>
+
+            <div class="menu-category">Configuración</div>
+            <a href="#" class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Evaluaciones</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div class="main-content">
+        <div class="header">
+            <h2>Gestión de Convenios</h2>
+            <div class="user-menu">
+                <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="Usuario">
+                <span>Administrador</span>
+            </div>
+        </div>
+        
+        <!-- Filtros y búsqueda -->
+        <div class="filters">
+            <div class="filter-group">
+                <label for="search">Buscar</label>
+                <input type="text" id="search" class="filter-control" placeholder="Empresa, código...">
+            </div>
+            <div class="filter-group">
+                <label for="status">Estado</label>
+                <select id="status" class="filter-control">
+                    <option value="">Todos</option>
+                    <option value="active">Activos</option>
+                    <option value="pending">Por vencer</option>
+                    <option value="expired">Finalizados</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="dateFrom">Desde</label>
+                <input type="date" id="dateFrom" class="filter-control">
+            </div>
+            <div class="filter-group">
+                <label for="dateTo">Hasta</label>
+                <input type="date" id="dateTo" class="filter-control">
+            </div>
+        </div>
+        
+        <!-- Sección de convenios -->
+        <div class="section">
+            <div class="section-header">
+                <h3>Listado de Convenios</h3>
+                <button class="btn" id="newAgreement">
+                    <i class="fas fa-plus"></i> Nuevo Convenio
+                </button>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Empresa</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Área</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>CONV-2023-001</td>
+                        <td>Tech Solutions S.A.</td>
+                        <td>15/03/2023</td>
+                        <td>15/03/2025</td>
+                        <td>Tecnología</td>
+                        <td><span class="badge badge-success">Activo</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn" title="Editar" onclick="openEditModal()">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn" title="Documentos" onclick="openDocumentsModal()">
+                                    <i class="fas fa-file-alt"></i>
+                                </button>
+                                <button class="action-btn" title="Finalizar">
+                                    <i class="fas fa-flag-checkered"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>CONV-2023-002</td>
+                        <td>Innovatech Corp</td>
+                        <td>01/04/2023</td>
+                        <td>01/04/2024</td>
+                        <td>Investigación</td>
+                        <td><span class="badge badge-success">Activo</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn" title="Editar" onclick="openEditModal()">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn" title="Documentos" onclick="openDocumentsModal()">
+                                    <i class="fas fa-file-alt"></i>
+                                </button>
+                                <button class="action-btn" title="Finalizar">
+                                    <i class="fas fa-flag-checkered"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>CONV-2022-045</td>
+                        <td>Global Systems</td>
+                        <td>10/10/2022</td>
+                        <td>10/10/2023</td>
+                        <td>Logística</td>
+                        <td><span class="badge badge-warning">Por vencer</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn" title="Editar" onclick="openEditModal()">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn" title="Documentos" onclick="openDocumentsModal()">
+                                    <i class="fas fa-file-alt"></i>
+                                </button>
+                                <button class="action-btn" title="Renovar">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>CONV-2021-012</td>
+                        <td>Data Analytics Ltda.</td>
+                        <td>05/06/2021</td>
+                        <td>05/06/2023</td>
+                        <td>Datos</td>
+                        <td><span class="badge badge-danger">Finalizado</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn" title="Editar" onclick="openEditModal()">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn" title="Documentos" onclick="openDocumentsModal()">
+                                    <i class="fas fa-file-alt"></i>
+                                </button>
+                                <button class="action-btn" title="Renovar">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>CONV-2023-003</td>
+                        <td>Health Medical Group</td>
+                        <td>01/05/2023</td>
+                        <td>01/05/2025</td>
+                        <td>Salud</td>
+                        <td><span class="badge badge-success">Activo</span></td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn" title="Editar" onclick="openEditModal()">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn" title="Documentos" onclick="openDocumentsModal()">
+                                    <i class="fas fa-file-alt"></i>
+                                </button>
+                                <button class="action-btn" title="Finalizar">
+                                    <i class="fas fa-flag-checkered"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="color: #7f8c8d; font-size: 0.9rem;">
+                    Mostrando 1 a 5 de 15 registros
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button class="action-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="action-btn active" style="background-color: var(--secondary-color); color: white;">
+                        1
+                    </button>
+                    <button class="action-btn">
+                        2
+                    </button>
+                    <button class="action-btn">
+                        3
+                    </button>
+                    <button class="action-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para nuevo/editar convenio -->
+    <div class="modal" id="agreementModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nuevo Convenio</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="agreementForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="agreementCode">Código de Convenio</label>
+                            <input type="text" id="agreementCode" class="form-control" placeholder="CONV-AAAA-NNN" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="agreementCompany">Empresa</label>
+                            <select id="agreementCompany" class="form-control" required>
+                                <option value="">Seleccione una empresa</option>
+                                <option value="1">Tech Solutions S.A.</option>
+                                <option value="2">Innovatech Corp</option>
+                                <option value="3">Global Systems</option>
+                                <option value="4">Data Analytics Ltda.</option>
+                                <option value="5">Health Medical Group</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">Fecha de Inicio</label>
+                            <input type="date" id="startDate" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">Fecha de Finalización</label>
+                            <input type="date" id="endDate" class="form-control" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="agreementArea">Área Profesional</label>
+                        <select id="agreementArea" class="form-control" required>
+                            <option value="">Seleccione un área</option>
+                            <option value="technology">Tecnología</option>
+                            <option value="health">Salud</option>
+                            <option value="engineering">Ingeniería</option>
+                            <option value="business">Negocios</option>
+                            <option value="education">Educación</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="agreementDescription">Descripción</label>
+                        <textarea id="agreementDescription" class="form-control" rows="3" placeholder="Descripción del convenio..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="agreementTerms">Términos y Condiciones</label>
+                        <textarea id="agreementTerms" class="form-control" rows="5" placeholder="Términos y condiciones del convenio..."></textarea>
+                    </div>
+                    
+                    <div class="document-list">
+                        <h4>Documentos Adjuntos</h4>
+                        <div class="document-item">
+                            <div class="document-info">
+                                <i class="fas fa-file-pdf document-icon"></i>
+                                <div>
+                                    <div>convenio_firmado.pdf</div>
+                                    <small style="color: #7f8c8d;">2.4 MB - 15/03/2023</small>
+                                </div>
+                            </div>
+                            <button class="action-btn" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="document-item">
+                            <div class="document-info">
+                                <i class="fas fa-file-word document-icon"></i>
+                                <div>
+                                    <div>carta_compromiso.docx</div>
+                                    <small style="color: #7f8c8d;">1.1 MB - 15/03/2023</small>
+                                </div>
+                            </div>
+                            <button class="action-btn" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <button type="button" class="btn" style="margin-top: 10px;">
+                            <i class="fas fa-plus"></i> Agregar Documento
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-success">Guardar Convenio</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para documentos -->
+    <div class="modal" id="documentsModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Documentos del Convenio CONV-2023-001</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="document-list">
+                    <div class="document-item">
+                        <div class="document-info">
+                            <i class="fas fa-file-pdf document-icon"></i>
+                            <div>
+                                <div>convenio_firmado.pdf</div>
+                                <small style="color: #7f8c8d;">2.4 MB - 15/03/2023</small>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="action-btn" title="Descargar">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="action-btn" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-info">
+                            <i class="fas fa-file-word document-icon"></i>
+                            <div>
+                                <div>carta_compromiso.docx</div>
+                                <small style="color: #7f8c8d;">1.1 MB - 15/03/2023</small>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="action-btn" title="Descargar">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="action-btn" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="document-item">
+                        <div class="document-info">
+                            <i class="fas fa-file-excel document-icon"></i>
+                            <div>
+                                <div>lista_estudiantes.xlsx</div>
+                                <small style="color: #7f8c8d;">0.8 MB - 20/03/2023</small>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="action-btn" title="Descargar">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="action-btn" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; border: 2px dashed #ddd; padding: 20px; text-align: center; border-radius: 5px;">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: #7f8c8d; margin-bottom: 10px;"></i>
+                    <div style="margin-bottom: 10px;">Arrastra y suelta archivos aquí o</div>
+                    <button type="button" class="btn">
+                        <i class="fas fa-folder-open"></i> Seleccionar Archivos
+                    </button>
+                    <div style="font-size: 0.8rem; color: #7f8c8d; margin-top: 10px;">
+                        Formatos permitidos: PDF, DOCX, XLSX, JPG, PNG (Máx. 10MB)
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funciones para manejar los modales
+        function openNewModal() {
+            document.getElementById('modalTitle').textContent = 'Nuevo Convenio';
+            document.getElementById('agreementModal').style.display = 'flex';
+        }
+        
+        function openEditModal() {
+            document.getElementById('modalTitle').textContent = 'Editar Convenio';
+            // Aquí iría el código para cargar los datos del convenio
+            document.getElementById('agreementModal').style.display = 'flex';
+        }
+        
+        function openDocumentsModal() {
+            document.getElementById('documentsModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('agreementModal').style.display = 'none';
+            document.getElementById('documentsModal').style.display = 'none';
+        }
+        
+        // Event listeners
+        document.getElementById('newAgreement').addEventListener('click', openNewModal);
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

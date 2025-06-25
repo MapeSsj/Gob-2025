@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Prácticas Pre-Profesionales</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --student-color: #3498db;
+            --academic-color: #9b59b6;
+            --business-color: #e67e22;
+            --admin-color: #e74c3c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .login-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .login-header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .login-header p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .login-body {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+        
+        .login-footer a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Selectores de rol */
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .role-option {
+            padding: 15px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 2px solid transparent;
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .role-option i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .role-option.student {
+            border-color: var(--student-color);
+        }
+        
+        .role-option.academic {
+            border-color: var(--academic-color);
+        }
+        
+        .role-option.business {
+            border-color: var(--business-color);
+        }
+        
+        .role-option.admin {
+            border-color: var(--admin-color);
+        }
+        
+        .role-option.active {
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .role-option.student.active {
+            background-color: var(--student-color);
+        }
+        
+        .role-option.academic.active {
+            background-color: var(--academic-color);
+        }
+        
+        .role-option.business.active {
+            background-color: var(--business-color);
+        }
+        
+        .role-option.admin.active {
+            background-color: var(--admin-color);
+        }
+        
+        .institutional-logo {
+            height: 100px;
+            margin-bottom: 15px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .alert-success {
+            background-color: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+        
+        .alert-error {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <img src="/4/recursos/logoInstituto.png" alt="Logo Institucional" class="institutional-logo">
+            <h1>Sistema de Gestión de Prácticas</h1>
+            <p>Acceso al portal de prácticas pre-profesionales</p>
+        </div>
+        
+        <div class="login-body">
+            <div id="alertMessage" class="alert"></div>
+            
+            <div class="role-selector">
+                <div class="role-option student active" data-role="student">
+                    <i class="fas fa-user-graduate"></i>
+                    Estudiante
+                </div>
+                <div class="role-option academic" data-role="academic">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    Tutor Académico
+                </div>
+                <div class="role-option business" data-role="business">
+                    <i class="fas fa-briefcase"></i>
+                    Tutor Empresarial
+                </div>
+                <div class="role-option admin" data-role="admin">
+                    <i class="fas fa-user-cog"></i>
+                    Administrador
+                </div>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Usuario o Correo Institucional</label>
+                    <input type="text" id="username" class="form-control" placeholder="usuario@institucion.edu" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" class="form-control" placeholder="Ingrese su contraseña" required>
+                </div>
+                
+                <div class="form-group" style="text-align: right;">
+                    <a href="#" style="font-size: 0.85rem;">¿Olvidó su contraseña?</a>
+                </div>
+                
+                <button type="submit" class="btn">Iniciar Sesión</button>
+            </form>
+            
+            <button id="devLogin" class="btn hidden" style="margin-top: 10px; background-color: var(--warning-color);">Acceso Desarrollo</button>
+        </div>
+        
+        <div class="login-footer">
+            ¿No tienes una cuenta? <a href="#">Solicitar acceso</a> | <a href="#">Ayuda</a>
+        </div>
+    </div>
+
+    <script>
+        // Base de datos de usuarios de demostración
+        const demoUsers = {
+            student: [
+                { username: "estudiante1@institucion.edu", password: "estudiante123", name: "Juan Pérez", role: "student" },
+                { username: "estudiante2@institucion.edu", password: "estudiante123", name: "María García", role: "student" }
+            ],
+            academic: [
+                { username: "tutor1@institucion.edu", password: "tutor123", name: "Prof. Carlos López", role: "academic" },
+                { username: "tutor2@institucion.edu", password: "tutor123", name: "Prof. Ana Martínez", role: "academic" }
+            ],
+            business: [
+                { username: "empresa1@empresa.com", password: "empresa123", name: "Ing. Roberto Sánchez", role: "business" },
+                { username: "empresa2@empresa.com", password: "empresa123", name: "Lic. Patricia Díaz", role: "business" }
+            ],
+            admin: [
+                { username: "admin@institucion.edu", password: "admin123", name: "Administrador del Sistema", role: "admin" }
+            ]
+        };
+        
+        // Mapeo de roles a nombres completos
+        const roleNames = {
+            student: "Estudiante",
+            academic: "Tutor Académico",
+            business: "Tutor Empresarial",
+            admin: "Administrador"
+        };
+        
+        // Selección de rol
+        let currentRole = "student";
+        const roleOptions = document.querySelectorAll('.role-option');
+        roleOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                roleOptions.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentRole = option.dataset.role;
+            });
+        });
+        
+        // Mostrar alerta
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alertMessage');    
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Validación del formulario
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Buscar usuario en la base de datos de demostración
+            const users = demoUsers[currentRole];
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                showAlert(`Bienvenido ${user.name} (${roleNames[currentRole]})`, 'success');
+                
+                // Redirección según el rol
+                setTimeout(() => {
+                    switch(currentRole) {
+                        case 'admin':
+                            window.location.href = 'panel-admin.html';
+                            break;
+                        case 'academic':
+                            window.location.href = 'panel-tutor-academico.html';
+                            break;
+                        case 'business':
+                            window.location.href = 'panel-tutor-empresarial.html';
+                            break;
+                        case 'student':
+                            window.location.href = 'panel-estudiante.html';
+                            break;
+                        default:
+                            window.location.href = 'login.html';
+                    }
+                }, 1000);
+            } else {
+                showAlert('Credenciales incorrectas. Por favor verifique su usuario y contraseña.', 'error');
+            }
+        });
+        
+        // Función para autocompletar credenciales (solo para desarrollo)
+        function autoFillCredentials() {
+            const users = demoUsers[currentRole];
+            if (users && users.length > 0) {
+                const randomUser = users[0]; // Tomamos el primer usuario del rol actual
+                document.getElementById('username').value = randomUser.username;
+                document.getElementById('password').value = randomUser.password;
+                showAlert('Credenciales de prueba cargadas. Haga clic en Iniciar Sesión.', 'success');
+            }
+        }
+        
+        // Mostrar botón de desarrollo solo en localhost
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+            document.getElementById('devLogin').classList.remove('hidden');
+            document.getElementById('devLogin').addEventListener('click', function(e) {
+                e.preventDefault();
+                autoFillCredentials();
+            });
+        }
+    </script>
+</body>
+</html>

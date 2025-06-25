@@ -45,7 +45,7 @@ function showProjectDetails(projectId) {
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                            <a href="proyecto${projectId}.html" class="btn btn-primary">Ver detalles completos</a>
+                            <a href="/${projectId}/proyecto${projectId}.html" class="btn btn-primary">Ver detalles completos</a>
                         </div>
                     </div>
                 </div>
