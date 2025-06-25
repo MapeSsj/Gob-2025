@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Matrículas - Estudiante</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .sidebar {
+            background-color: #343a40;
+            color: white;
+            min-height: 100vh;
+        }
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+        }
+        .sidebar a:hover {
+            color: white;
+            background-color: #495057;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .course-card {
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+        .selected {
+            border: 2px solid #0d6efd;
+            background-color: #f0f7ff;
+        }
+        .badge-credit {
+            background-color: #6c757d;
+        }
+        .tab-content {
+            padding: 20px 0;
+        }
+        .schedule-table {
+            font-size: 0.9rem;
+        }
+        .schedule-table th {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-dark">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <img src="https://via.placeholder.com/80" class="rounded-circle" alt="Foto perfil">
+                        <h5 class="mt-2">Juan Pérez</h5>
+                        <p class="text-muted">Estudiante - Ingeniería</p>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="#historial" class="nav-link active" data-bs-toggle="tab">
+                                <i class="bi bi-journal-text me-2"></i> Historial Académico
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#matricula" class="nav-link" data-bs-toggle="tab">
+                                <i class="bi bi-book me-2"></i> Matrícula de Cursos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#horario" class="nav-link" data-bs-toggle="tab">
+                                <i class="bi bi-calendar-week me-2"></i> Horario
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Sistema de Matrículas</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-sm btn-outline-secondary me-2" id="downloadPdf">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> Descargar Comprobante
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-box-arrow-right me-1"></i> Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tab-content">
+                    <!-- Historial Académico Tab -->
+                    <div class="tab-pane fade show active" id="historial">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Historial Académico</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Semestre</th>
+                                                <th>Código</th>
+                                                <th>Curso</th>
+                                                <th>Créditos</th>
+                                                <th>Nota</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>2023-1</td>
+                                                <td>MAT101</td>
+                                                <td>Matemáticas Básicas</td>
+                                                <td>4</td>
+                                                <td>16</td>
+                                                <td><span class="badge bg-success">Aprobado</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>2023-1</td>
+                                                <td>FIS101</td>
+                                                <td>Física General</td>
+                                                <td>4</td>
+                                                <td>14</td>
+                                                <td><span class="badge bg-success">Aprobado</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>2023-1</td>
+                                                <td>PRO101</td>
+                                                <td>Programación I</td>
+                                                <td>3</td>
+                                                <td>18</td>
+                                                <td><span class="badge bg-success">Aprobado</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>2023-2</td>
+                                                <td>MAT102</td>
+                                                <td>Cálculo I</td>
+                                                <td>4</td>
+                                                <td>13</td>
+                                                <td><span class="badge bg-success">Aprobado</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>2023-2</td>
+                                                <td>PRO102</td>
+                                                <td>Programación II</td>
+                                                <td>3</td>
+                                                <td>17</td>
+                                                <td><span class="badge bg-success">Aprobado</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-4">
+                                        <div class="card bg-light">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Resumen Académico</h6>
+                                                <p><strong>Promedio Ponderado:</strong> 15.4</p>
+                                                <p><strong>Créditos Aprobados:</strong> 18</p>
+                                                <p><strong>Créditos Pendientes:</strong> 142</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matrícula de Cursos Tab -->
+                    <div class="tab-pane fade" id="matricula">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Matrícula de Cursos - Semestre 2023-3</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <strong>Información:</strong> Puedes seleccionar cursos según tu avance académico. 
+                                    Créditos mínimos: 12 | Créditos máximos: 20
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Buscar cursos...">
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="bi bi-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <span class="badge bg-primary">Créditos seleccionados: <span id="creditosSeleccionados">0</span>/20</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="row" id="cursosDisponibles">
+                                    <!-- Curso 1 -->
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card course-card" data-course-id="MAT103" data-credits="4">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Cálculo II</h5>
+                                                <h6 class="card-subtitle mb-2 text-muted">MAT103</h6>
+                                                <p class="card-text">Continuación de Cálculo I. Funciones de varias variables.</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-primary">Semestre 3</span>
+                                                    <span class="badge badge-credit">4 créditos</span>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Prerrequisitos:</strong> MAT102</small>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Horario:</strong> Lun/Mié 8:00-10:00</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Curso 2 -->
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card course-card" data-course-id="FIS102" data-credits="4">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Física Avanzada</h5>
+                                                <h6 class="card-subtitle mb-2 text-muted">FIS102</h6>
+                                                <p class="card-text">Termodinámica y ondas. Laboratorio incluido.</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-primary">Semestre 3</span>
+                                                    <span class="badge badge-credit">4 créditos</span>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Prerrequisitos:</strong> FIS101</small>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Horario:</strong> Mar/Jue 10:00-12:00</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Curso 3 -->
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card course-card" data-course-id="PRO201" data-credits="3">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Estructuras de Datos</h5>
+                                                <h6 class="card-subtitle mb-2 text-muted">PRO201</h6>
+                                                <p class="card-text">Estudio de estructuras de datos fundamentales.</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-primary">Semestre 3</span>
+                                                    <span class="badge badge-credit">3 créditos</span>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Prerrequisitos:</strong> PRO102</small>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Horario:</strong> Mié/Vie 14:00-16:00</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Curso 4 -->
+                                    <div class="col-md-4 mb-3">
+                                        <div class="card course-card" data-course-id="ING101" data-credits="3">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Inglés Técnico</h5>
+                                                <h6 class="card-subtitle mb-2 text-muted">ING101</h6>
+                                                <p class="card-text">Inglés aplicado a contextos académicos y técnicos.</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-primary">Semestre 3</span>
+                                                    <span class="badge badge-credit">3 créditos</span>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Prerrequisitos:</strong> Ninguno</small>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Horario:</strong> Lun/Mié 16:00-18:00</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <h5>Cursos Seleccionados</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered" id="tablaSeleccionados">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Código</th>
+                                                        <th>Curso</th>
+                                                        <th>Créditos</th>
+                                                        <th>Horario</th>
+                                                        <th>Acción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Aquí se agregarán dinámicamente los cursos seleccionados -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-12 text-end">
+                                        <button class="btn btn-primary" id="btnRegistrarMatricula">Registrar Matrícula</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Horario Tab -->
+                    <div class="tab-pane fade" id="horario">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">Horario Académico</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-warning">
+                                    <strong>Nota:</strong> Este horario refleja los cursos matriculados actualmente.
+                                </div>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-bordered schedule-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Hora</th>
+                                                <th>Lunes</th>
+                                                <th>Martes</th>
+                                                <th>Miércoles</th>
+                                                <th>Jueves</th>
+                                                <th>Viernes</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>8:00 - 10:00</td>
+                                                <td id="lun-8" rowspan="2">Cálculo II<br>MAT103</td>
+                                                <td id="mar-8"></td>
+                                                <td id="mie-8" rowspan="2">Cálculo II<br>MAT103</td>
+                                                <td id="jue-8"></td>
+                                                <td id="vie-8"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>10:00 - 12:00</td>
+                                                <td id="mar-10" rowspan="2">Física Avanzada<br>FIS102</td>
+                                                <td id="jue-10" rowspan="2">Física Avanzada<br>FIS102</td>
+                                                <td id="vie-10"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>12:00 - 14:00</td>
+                                                <td id="lun-12"></td>
+                                                <td id="mie-12"></td>
+                                                <td id="vie-12"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>14:00 - 16:00</td>
+                                                <td id="lun-14"></td>
+                                                <td id="mar-14"></td>
+                                                <td id="mie-14" rowspan="2">Estructuras de Datos<br>PRO201</td>
+                                                <td id="jue-14"></td>
+                                                <td id="vie-14" rowspan="2">Estructuras de Datos<br>PRO201</td>
+                                            </tr>
+                                            <tr>
+                                                <td>16:00 - 18:00</td>
+                                                <td id="lun-16" rowspan="2">Inglés Técnico<br>ING101</td>
+                                                <td id="mar-16"></td>
+                                                <td id="jue-16"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>18:00 - 20:00</td>
+                                                <td id="mie-18"></td>
+                                                <td id="mar-18"></td>
+                                                <td id="jue-18"></td>
+                                                <td id="vie-18"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Matrícula</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas registrar tu matrícula con los siguientes cursos?</p>
+                    <ul id="modalCursosList">
+                        <!-- Se llenará dinámicamente -->
+                    </ul>
+                    <p>Total de créditos: <strong id="modalCreditosTotal">0</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirmarMatricula">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Matrícula Exitosa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tu matrícula ha sido registrada exitosamente.</p>
+                    <p>Puedes descargar tu comprobante de matrícula en formato PDF.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="descargarComprobante">Descargar Comprobante</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variables para manejar los cursos seleccionados
+            let selectedCourses = [];
+            let totalCredits = 0;
+            const maxCredits = 20;
+            const minCredits = 12;
+            
+            // Selección de cursos
+            const courseCards = document.querySelectorAll('.course-card');
+            const selectedCoursesTable = document.querySelector('#tablaSeleccionados tbody');
+            const creditosSeleccionadosSpan = document.getElementById('creditosSeleccionados');
+            
+            courseCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const courseId = this.getAttribute('data-course-id');
+                    const credits = parseInt(this.getAttribute('data-credits'));
+                    
+                    // Verificar si el curso ya está seleccionado
+                    const index = selectedCourses.findIndex(c => c.id === courseId);
+                    
+                    if (index === -1) {
+                        // Verificar límite de créditos
+                        if (totalCredits + credits > maxCredits) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Límite de créditos',
+                                text: `No puedes exceder el límite de ${maxCredits} créditos.`,
+                                confirmButtonColor: '#0d6efd'
+                            });
+                            return;
+                        }
+                        
+                        // Agregar curso a la selección
+                        selectedCourses.push({
+                            id: courseId,
+                            name: this.querySelector('.card-title').textContent,
+                            credits: credits,
+                            schedule: this.querySelectorAll('.text-muted')[1].textContent.replace('Horario: ', '')
+                        });
+                        
+                        totalCredits += credits;
+                        this.classList.add('selected');
+                    } else {
+                        // Quitar curso de la selección
+                        selectedCourses.splice(index, 1);
+                        totalCredits -= credits;
+                        this.classList.remove('selected');
+                    }
+                    
+                    // Actualizar la tabla de cursos seleccionados
+                    updateSelectedCoursesTable();
+                    
+                    // Actualizar el contador de créditos
+                    creditosSeleccionadosSpan.textContent = totalCredits;
+                });
+            });
+            
+            function updateSelectedCoursesTable() {
+                // Limpiar tabla
+                selectedCoursesTable.innerHTML = '';
+                
+                // Llenar con cursos seleccionados
+                selectedCourses.forEach(course => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${course.id}</td>
+                        <td>${course.name}</td>
+                        <td>${course.credits}</td>
+                        <td>${course.schedule}</td>
+                        <td><button class="btn btn-sm btn-danger btn-remove" data-id="${course.id}">Quitar</button></td>
+                    `;
+                    selectedCoursesTable.appendChild(row);
+                });
+                
+                // Agregar eventos a los botones de quitar
+                document.querySelectorAll('.btn-remove').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const courseId = this.getAttribute('data-id');
+                        const courseIndex = selectedCourses.findIndex(c => c.id === courseId);
+                        
+                        if (courseIndex !== -1) {
+                            // Quitar clase selected de la tarjeta correspondiente
+                            document.querySelectorAll('.course-card').forEach(card => {
+                                if (card.getAttribute('data-course-id') === courseId) {
+                                    card.classList.remove('selected');
+                                }
+                            });
+                            
+                            // Actualizar créditos y quitar curso
+                            totalCredits -= selectedCourses[courseIndex].credits;
+                            selectedCourses.splice(courseIndex, 1);
+                            
+                            // Actualizar tabla y contador
+                            updateSelectedCoursesTable();
+                            creditosSeleccionadosSpan.textContent = totalCredits;
+                        }
+                    });
+                });
+            }
+            
+            // Botón de registrar matrícula
+            document.getElementById('btnRegistrarMatricula').addEventListener('click', function() {
+                if (selectedCourses.length === 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Debes seleccionar al menos un curso para matricularte.',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+                
+                if (totalCredits < minCredits) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Créditos insuficientes',
+                        text: `Debes seleccionar al menos ${minCredits} créditos para completar tu matrícula.`,
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+                
+                // Mostrar modal de confirmación
+                const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                const cursosList = document.getElementById('modalCursosList');
+                const creditosTotal = document.getElementById('modalCreditosTotal');
+                
+                // Limpiar y llenar lista de cursos
+                cursosList.innerHTML = '';
+                selectedCourses.forEach(course => {
+                    const li = document.createElement('li');
+                    li.textContent = `${course.id} - ${course.name} (${course.credits} créditos)`;
+                    cursosList.appendChild(li);
+                });
+                
+                // Actualizar total de créditos
+                creditosTotal.textContent = totalCredits;
+                
+                // Mostrar modal
+                modal.show();
+            });
+            
+            // Confirmar matrícula en el modal
+            document.getElementById('confirmarMatricula').addEventListener('click', function() {
+                // Aquí iría la lógica para enviar los datos al servidor
+                
+                // Simular éxito
+                const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                confirmModal.hide();
+                
+                // Mostrar modal de éxito
+                const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                successModal.show();
+            });
+            
+            // Descargar comprobante PDF
+            document.getElementById('descargarComprobante').addEventListener('click', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Descarga iniciada',
+                    text: 'Tu comprobante de matrícula se está descargando.',
+                    confirmButtonColor: '#0d6efd'
+                });
+                
+                // Simular descarga
+                setTimeout(() => {
+                    const successModal = bootstrap.Modal.getInstance(document.getElementById('successModal'));
+                    successModal.hide();
+                }, 2000);
+            });
+            
+            // También para el botón en el header
+            document.getElementById('downloadPdf').addEventListener('click', function() {
+                if (selectedCourses.length === 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No hay cursos seleccionados para generar comprobante.',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Descarga iniciada',
+                    text: 'Tu comprobante de matrícula se está descargando.',
+                    confirmButtonColor: '#0d6efd'
+                });
+            });
+            
+            // Navegación entre tabs
+            const tabLinks = document.querySelectorAll('.sidebar a[data-bs-toggle="tab"]');
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    tabLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
