@@ -191,6 +191,28 @@
         .btn:active {
             transform: translateY(0);
         }
+
+        .btn-back {
+            display: inline-block;
+            width: auto;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            color: var(--dark);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-back:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
         
         .role-selector {
             display: flex;
@@ -498,22 +520,24 @@
             </div>
             <img src="https://cdn-icons-png.flaticon.com/512/3209/3209260.png" alt="Ilustración de acceso" class="illustration-img">
             <div class="illustration-text">
-                <h2>Bienvenido al Sistema Institucional</h2>
-                <p>Accede a todas las herramientas diseñadas para mejorar tu experiencia académica y administrativa</p>
+                <h2 id="welcome-title">Bienvenido al Sistema Institucional</h2>
+                <p id="welcome-description">Accede a todas las herramientas diseñadas para mejorar tu experiencia académica y administrativa</p>
             </div>
         </div>
         
         <!-- Sección del formulario -->
         <div class="form-section">
             <form class="login-form" id="loginForm">
+                <a href="/index.html" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+                
                 <div class="logo">
                     <div style="background-color: #4361ee; width: 60px; height: 60px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
                         <i class="fas fa-graduation-cap" style="color: white; font-size: 28px;"></i>
                     </div>
                     <h1>Iniciar Sesión</h1>
                 </div>
-                
-
                 
                 <div class="role-selector">
                     <div class="role-option active" data-role="student">
@@ -580,12 +604,45 @@
     </div>
 
     <script>
+        // Datos de roles y sus dominios de correo permitidos
+        const roleDomains = {
+            student: ['estudiante@gmail.com', 'estudiante2@gmail.com'],
+            teacher: ['docente@gmail.com', 'profesor@gmail.com'],
+            admin: ['admin@gmail.com', 'administrador@gmail.com']
+        };
+
+        // Textos descriptivos para cada rol
+        const roleDescriptions = {
+            student: {
+                title: "Bienvenido Estudiante",
+                description: "Accede a tus cursos, calificaciones y recursos académicos."
+            },
+            teacher: {
+                title: "Bienvenido Docente",
+                description: "Gestiona tus cursos, califica estudiantes y comparte materiales."
+            },
+            admin: {
+                title: "Bienvenido Administrador",
+                description: "Administra el sistema, usuarios y configuración institucional."
+            }
+        };
+
         // Selección de rol
         document.querySelectorAll('.role-option').forEach(option => {
             option.addEventListener('click', function() {
+                const role = this.getAttribute('data-role');
+                
                 document.querySelectorAll('.role-option').forEach(opt => opt.classList.remove('active'));
                 this.classList.add('active');
-                document.getElementById('userRole').value = this.getAttribute('data-role');
+                document.getElementById('userRole').value = role;
+                
+                // Actualizar textos descriptivos
+                document.getElementById('welcome-title').textContent = roleDescriptions[role].title;
+                document.getElementById('welcome-description').textContent = roleDescriptions[role].description;
+                
+                // Limpiar campos al cambiar de rol
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
             });
         });
         
@@ -629,27 +686,41 @@
             // Obtener valores del formulario
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const selectedRole = document.getElementById('userRole').value;
+            
+            // Validar que el correo coincida con el rol seleccionado
+            const validEmails = roleDomains[selectedRole];
+            const isValidEmail = validEmails.includes(email);
             
             // Validar credenciales
             let redirectPage = null;
             let role = '';
+            let isValidCredentials = false;
             
             if (email === 'admin@gmail.com' && password === '123456') {
                 redirectPage = '/2/administrador/admin.html';
                 role = 'Administrador';
+                isValidCredentials = true;
             } else if (email === 'estudiante@gmail.com' && password === '123456') {
                 redirectPage = '/2/estudiante/student.html';
                 role = 'Estudiante';
+                isValidCredentials = true;
             } else if (email === 'docente@gmail.com' && password === '123456') {
                 redirectPage = '/2/docente/teacher.html';
                 role = 'Docente';
+                isValidCredentials = true;
             }
             
             // Simular un pequeño retardo para que se vea la animación de carga
             setTimeout(() => {
                 loginBtn.classList.remove('btn-loading');
                 
-                if (redirectPage) {
+                if (!isValidEmail) {
+                    showMessage('error', 'El correo no corresponde al rol seleccionado.');
+                    return;
+                }
+                
+                if (isValidCredentials) {
                     showMessage('success', `¡Acceso exitoso como ${role}! Redirigiendo...`);
                     
                     // Redirigir a la página correspondiente después de 1.5 segundos
@@ -675,9 +746,36 @@
             });
         });
         
-        // Rellenar automáticamente para pruebas
-        document.getElementById('email').value = 'estudiante@gmail.com';
-        document.getElementById('password').value = '123456';
+        // Rellenar automáticamente para pruebas según el rol seleccionado
+        function fillDemoCredentials(role) {
+            let email = '', password = '123456';
+            
+            switch(role) {
+                case 'student':
+                    email = 'estudiante@gmail.com';
+                    break;
+                case 'teacher':
+                    email = 'docente@gmail.com';
+                    break;
+                case 'admin':
+                    email = 'admin@gmail.com';
+                    break;
+            }
+            
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+        }
+        
+        // Llenar credenciales demo al cambiar de rol
+        document.querySelectorAll('.role-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const role = this.getAttribute('data-role');
+                fillDemoCredentials(role);
+            });
+        });
+        
+        // Llenar credenciales demo iniciales
+        fillDemoCredentials('student');
     </script>
 </body>
 </html>
